@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Backbone Tests</title>
+	<link rel="stylesheet" href="../../node_modules/mocha/mocha.css" />
+	<script src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<div id="mocha"></div>
+
+		<script src="../../node_modules/chai/chai.js"></script>
+		<script src="../../node_modules/mocha/mocha.js"></script>
+
+		<script>
+			var expect = chai.expect;
+			mocha.setup('bdd');
+			mocha.run();
+		</script>
+
+		<script src="index.js"></script>
+
+		<script>
+			mocha.checkLeaks();
+			mocha.globals([]);
+			mocha.run();
+		</script>
+
+</body>
+</html>
