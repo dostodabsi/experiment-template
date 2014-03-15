@@ -1,6 +1,7 @@
 var exec       = require('child_process').exec;
 var watchify   = require('watchify');
 
+var brfs       = require('brfs');
 var gulp       = require('gulp');
 var jshint     = require('gulp-jshint');
 var mocha      = require('gulp-mocha');
@@ -9,11 +10,13 @@ var uglify     = require('gulp-uglify');
 var concat     = require('gulp-concat'); 
 var browserify = require('gulp-browserify');
 
+
 // browserify all the things!
 gulp.task('build-app', function() {
   return gulp.src('./client/app/main.js')
           .pipe(browserify({
             insertGlobals: true,
+            transform: ['brfs'], // for fs.readFileSync in views
             debug: true
           }))
           //.pipe(uglify())
