@@ -11,7 +11,7 @@ The testing framework is Mocha with Chai, both on the client and server.
 git clone https://github.com/dostodabsi/experiment-template
 cd experiment-template && npm install 
 cd server && npm install
-cd ../server && npm install
+cd ../client && npm install
 ```
 
 
