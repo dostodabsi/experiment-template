@@ -3,13 +3,17 @@ var Backbone = require('backbone');
 
 var Participant = Backbone.Model.extend({
   urlRoot: '/api/participant',
-  defaults: function() {
-    return {
-      'age': 0,
-      'country': '',
-      'userAgent': window.navigator.userAgent
-    };
+  defaults: {
+    'age': 0,
+    'sex': '',
+    'userAgent': '',
+    'windowSize': '',
+    'handedness': ''
+  },
+
+  initialize: function(options) {
+    console.log('Initialized participant!');
   }
 });
 
-module.exports = Participant;
+module.exports = new Participant();

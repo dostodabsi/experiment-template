@@ -3,7 +3,9 @@ var Backbone = require('backbone');
 
 var Router = Backbone.Router.extend({
   routes: {
-    '': 'home'
+    ''          : 'instruction',
+    'questions' : 'questions',
+    'exp'       : 'exp'
   },
 });
 
