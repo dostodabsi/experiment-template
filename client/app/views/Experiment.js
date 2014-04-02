@@ -1,38 +1,22 @@
-var fs           = require('fs');
-var _            = require('underscore');
 var $            = require('jquery');
+var _            = require('underscore');
 var Backbone     = require('backbone');
-var Flanker      = require('../experiment/flanker');
-var participant  = require('../models/Participant');
+var Experiment  = require('../experiment/experiment');
 Backbone.$ = $;
 
-var experiment = fs.readFileSync(
-    __dirname + '/../templates/experiment.html', 'utf8');
 
-var Experiment = Backbone.View.extend({
-  el: '.page',
-  model: participant,
-  experiment: new Flanker(),
-  template: _.template(experiment),
+var ExperimentView = Backbone.View.extend({
+
+  experiment: new Experiment(),
 
   initialize: function() {
-    this.experiment.start(); // start the experiment
-  },
-
-  events: {
-    'click .finished': 'finished'
-  },
-
-  render: function() {
-    this.$el.html(this.template);
-    return this;
-  },
-
-  finished: function(ev) {
-    ev.preventDefault();
-    var exp = this.experiment.getData();
-    participant.save({ exp: exp });
+    var self = this;
+    this.experiment.start();
+    setTimeout(function() {
+      self.experiment.finish();
+    }, 10000);
   }
+
 });
 
-module.exports = Experiment;
+module.exports = ExperimentView;

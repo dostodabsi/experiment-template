@@ -1,12 +1,9 @@
 var _            = require('underscore');
 var $            = require('jquery');
 var Backbone     = require('backbone');
-
 Backbone.$ = $;
 
-var flanker      = require('./experiment/flanker');
 var Router       = require('./routers/Router');
-
 var Instruction  = require('./views/Instruction');
 var Questions    = require('./views/Questions');
 var Experiment   = require('./views/Experiment');

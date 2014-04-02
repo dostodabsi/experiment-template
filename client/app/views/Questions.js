@@ -9,6 +9,7 @@ var questions = fs.readFileSync(
     __dirname + '/../templates/questions.html', 'utf8');
 
 var Questions = Backbone.View.extend({
+
   el: '.page',
   template: _.template(questions),
 
@@ -55,6 +56,7 @@ var Questions = Backbone.View.extend({
       });
     }
   }
+
 });
 
 module.exports = Questions;

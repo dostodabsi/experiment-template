@@ -1,5 +1,7 @@
-var $ = require('jquery');
-var _ = require('underscore');
+var fs = require('fs');
+var $  = require('jquery');
+var _  = require('underscore');
+
 
 exports.hidden = function() {
   if ('hidden' in document) { return 'hidden'; }

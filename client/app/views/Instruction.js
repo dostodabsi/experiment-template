@@ -8,6 +8,7 @@ var instruction = fs.readFileSync(
     __dirname + '/../templates/instruction.html', 'utf8');
 
 var Instruction = Backbone.View.extend({
+
   el: '.page',
   template: _.template(instruction),
 
