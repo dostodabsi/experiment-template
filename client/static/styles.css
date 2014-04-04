@@ -1,19 +1,57 @@
-.container {
-	width: 80%;
+body {
+	color: white;
+	width: 800px;
 	margin: 0 auto;
+	background: black;
+}
+
+.container {
+	width: 700px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.page {
+	font-size: 20px;
+	margin-top: 10%;
 }
 
 .instruction {
-  font-size: 20px;
+	margin: 0 auto;
+	width: 800px;
+}
+
+.questions form .row {
+	padding-top: 20px;
+}
+
+.create-new-participant > legend {
+	color: white;
+	font-size: 30px;
+}
+
+.flanker-stim {
+	margin-top: 30%;
 }
 
 .flanker-stim td {
-	text-align: center;
-	font-size: 50px;
 	padding: 50px;
+	font-size: 50px;
+	text-align: center;
 }
 
-.fixCross {
+.otherFeedback {
 	color: black;
-	font-size: 50px;
+}
+
+.feedback {
+	color: white;
+}
+
+.negativeFeedback {
+	color: red;
+}
+
+.positiveFeedback: {
+	color: green;
 }

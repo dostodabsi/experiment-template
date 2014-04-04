@@ -1,20 +1,16 @@
-var $            = require('jquery');
-var _            = require('underscore');
-var Backbone     = require('backbone');
-var Experiment  = require('../experiment/experiment');
+var $           = require('jquery');
+var _           = require('underscore');
+var Backbone    = require('backbone');
+var Flanker     = require('../experiment/flanker');
 Backbone.$ = $;
 
 
 var ExperimentView = Backbone.View.extend({
 
-  experiment: new Experiment(),
+  experiment: new Flanker(),
 
   initialize: function() {
-    var self = this;
-    this.experiment.start();
-    setTimeout(function() {
-      self.experiment.finish();
-    }, 10000);
+    this.experiment.startExperiment();
   }
 
 });

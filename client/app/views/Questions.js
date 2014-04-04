@@ -11,6 +11,7 @@ var questions = fs.readFileSync(
 var Questions = Backbone.View.extend({
 
   el: '.page',
+  participant: participant,
   template: _.template(questions),
 
   events: {
@@ -33,13 +34,9 @@ var Questions = Backbone.View.extend({
   },
 
   getInfo: function() {
-    var w = window.innerWidth;
-    var h = window.innerHeight;
-    var windowSize = [w, h].join(', ');
-    var userAgent = navigator.userAgent;
     return {
-      userAgent: userAgent,
-      windowSize: windowSize
+      userAgent: navigator.userAgent,
+      windowSize: [window.innerWidth, window.innerHeight]
     };
   },
 
@@ -49,7 +46,7 @@ var Questions = Backbone.View.extend({
 
       var details = $(ev.currentTarget).serializeObject();
       _.extend(details, browserInfo);
-      participant.save(details, {
+      this.participant.save(details, {
         success: function(user) {
           Backbone.history.navigate('exp', { trigger: true });
         }

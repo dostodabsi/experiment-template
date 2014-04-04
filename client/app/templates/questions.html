@@ -1,23 +1,42 @@
-<form class="create-new-participant">
-	<legend>Information</legend>
+<div class="questions">
+	<form role="form" class="create-new-participant">
+		<legend>Information</legend>
 
-	<label for="sex">Sex</label>
-	<br>
-	<input type="radio" name="sex" value="male"> Male
-	<input type="radio" name="sex" value="female"> Female
-	<br>
+		<div class="row">
+			<div class="form-group">
+				<div class="col-md-4">
+					<label for="sex">Sex</label><br>
+					<input type="radio" name="sex" value="male"> Male
+					<input type="radio" name="sex" value="female"> Female
+				</div>
+			</div>
+		</div>
 
-	<label for="handedness">Handedness</label>
-	<br>
-	<input type="radio" name="handedness" value="left"> Left
-	<input type="radio" name="handedness" value="right"> Right
-	<input type="radio" name="handedness" value="both"> Both
-	<br>
+	  <div class="row">
+			<div class="form-group">
+				<div class="col-md-4">
+					<label for="handedness">Handedness</label><br>
+					<input type="radio" name="handedness" value="left"> Left
+					<input type="radio" name="handedness" value="right"> Right
+					<input type="radio" name="handedness" value="both"> Both
+				</div>
+			</div>
+		</div>
 
-	<label for="age">Age</label>
-	<br>
-	<input type="text" name="age">
-	<br>
+		<div class="row">
+			<div class="form-group">
+				<div class="col-md-4">
+					<label for="age">Age</label><br>
+					<input type="text" class="form-control" name="age">
+				</div>
+			</div>
+		</div>
 
-	<input type="submit" class="btn" value="Start">
-</form>
+		<div class="row">
+			<div class="col-md-4">
+				<input type="submit" class="btn btn-success" value="Start">
+			</div>
+		</div>
+
+	</form>
+</div>

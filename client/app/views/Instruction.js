@@ -13,18 +13,19 @@ var Instruction = Backbone.View.extend({
   template: _.template(instruction),
 
   initialize: function() {
-    var self = this;
-    var width = window.innerWidth;
-    var height = window.innerHeight;
-    $(window).on('resize', function() {
-      var fullscreen = (window.innerWidth > width &&
-                       window.innerHeight > height);
-      if (fullscreen) { self.showButton(); }
-    });
+    this.width  = window.innerWidth;
+    this.height = window.innerHeight;
+    $(window).on('resize', $.proxy(this.checkResize, this));
   },
 
   events: {
     'click .agree': 'participate'
+  },
+
+  checkResize: function(ev) {
+    var fullscreen = (window.innerWidth > this.width &&
+                      window.innerHeight > this.height);
+    if (fullscreen) { this.showButton(); }
   },
 
   render: function() {
