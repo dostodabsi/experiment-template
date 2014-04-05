@@ -25,53 +25,35 @@ var ExperimentTemplate = Backbone.Model.extend({
   fixCross: 'please override',
   binaryMap: 'please override',
 
+  initialize: function() {
+    this.userKeyPress = _.partial(this.onKeyPress, this.binaryMap);
+  },
+
   extend: function(func, context) {
     ExperimentTemplate.prototype[func].call(context);
   },
 
-  /*
-   * Upon Initialization of the Experiment, bind the relevant Actions
-   * to the specific Events in the Experiment:
-   *
-   * - on startExperiment, add the relevant environmental Checks
-   * - on startTrial, add the keyEvents and start recording of the RT
-   * - on endTrial, remove the keyEvents, show fixCross, compute RT
-   *
-   */
-
-  initialize: function() {
-    this.userKeyPress = _.partial(this.onKeyPress, this.binaryMap);
-
-    this.on('startExperiment', this.addTabCheck);
-    this.on('startExperiment', this.addWindowCheck);
-    this.on('startExperiment', this.leftExperiment);
-    this.on('startExperiment', this.startExperiment);
-
-    this.on('startTrial', this.addKeyEvents);
-    this.on('startTrial', this.startTrial);
-    this.on('startTrial', this.startRecording);
-
-    this.on('endTrial', this.removeKeyEvents);
-
-    this.on('endExperiment', this.finish);
-  },
-
   startExperiment: function() {
-    this.trigger('startTrial');
+    this.addTabCheck();
+    this.addWindowCheck();
+    this.leftExperiment();
+    this.startTrial();
   },
 
   /*
    * Methods that should be overriden by the specific Experiment
    */
 
-  startTrial: function() {},
+  startTrial: function() {
+    this.addKeyEvents();
+    this.startRecording();
+  },
 
   prepareStim: function() {},
 
   changeStim: function(file) {},
 
   showfixCross: function() {},
-
 
   /*
    * Methods for the Recording of the Reaction Time
@@ -82,35 +64,45 @@ var ExperimentTemplate = Backbone.Model.extend({
   },
 
   endRecording: function(pressed, start) {
-    var time = +new Date() - start;
-    var right = this.get('isRight');
-    var obj = _.object([pressed], [time]);
-    this.get('trials').push(_.extend(obj, { isRight: right }));
+    var save;
+    if (pressed === null) {
+      save = { reaction: 'too slow' };
+    }
+    else {
+      var time = +new Date() - start;
+      var obj = _.object([pressed], [time]);
+      save = _.extend(obj, { isRight: this.get('isRight') });
+    }
+
+    this.get('trials').push(save);
   },
 
   computeFeedback: function() {
     var trials = this.get('trials');
-    var RT = _.flatten(_.map(trials, _.values));
-    return RT / trials.length;
+    var add = function(a, b) { return a + b; };
+    var isNumber = function(e) { return !_.isBoolean(e); };
+    var reactionTimes = _.filter(_.flatten(_.map(trials, _.values)), isNumber);
+    var mean = _.reduce(reactionTimes, add, 0);
+    return mean / trials.length;
   },
 
-  /*
+  /**********************************************************************
    * Methods that are important for the User Interaction:
    * - onKeyPress: provided a map, checks if user gives the right answer
-   * - addTabCheck: if User changes the Tab, e.g. does something different
+   * - addTabCheck: check if the User changes the Tab 
    * - addWindowCheck: check if the User changes the Window Size
    * - leftExperiment: check if the User leaves the experiment, warn her
-   */
+   ***********************************************************************/
 
   onKeyPress: function(binaryMap, ev) {
     var code = ev.keyCode || ev.which;
-    var map = _.map(binaryMap, function(val, key) {
+    var map  = _.map(binaryMap, function(val, key) {
       if (val == code) return key;
     });
     var pressed = _.first(_.filter(map, Boolean));
-    if (pressed) {
+    if (!_.isEmpty(pressed)) {
+      this.checkAnswer(pressed);
       this.endRecording(pressed, this.get('start'));
-      this.trigger('queryAnswer', { pressed: pressed });
     }
   },
 
@@ -153,7 +145,6 @@ var ExperimentTemplate = Backbone.Model.extend({
   },
 
   finish: function() {
-    this.off();
     $(window).unbind('beforeunload');
     var exp = _.omit(this.attributes, ['start', 'isRight']);
     this.participant.save({ exp: exp });

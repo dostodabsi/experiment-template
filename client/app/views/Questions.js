@@ -30,6 +30,10 @@ var Questions = Backbone.View.extend({
       alert('Upps, you forgot to answer one or more questions!');
       return false;
     }
+    if (_.isNaN(parseInt(data.age, 10))) {
+      alert('Age must be a digit!');
+      return false;
+    }
     return true;
   },
 

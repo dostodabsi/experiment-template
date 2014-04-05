@@ -20,10 +20,11 @@ var files = {
   2: incomp,
   3: comp,
   4: incomp,
-  5: comp,
-  6: incomp,
+  5: 'block',
   7: comp,
-  8: incomp
+  8: incomp,
+  9: comp,
+  10: incomp
 };
 
 
@@ -36,73 +37,49 @@ var Flanker = ExperimentTemplate.extend({
   curStim: undefined,
   keys: _.keys(files),
   stimuli: _.values(files),
-
   binaryMap: { 'f': 70, 'h': 72 },
 
+  feedback: feedback,
   fixCross: _.template(fixCross, { feedback: '+' }),
   negFeedback: _.template(fixCross, { feedback: 'X' }),
   posFeedback: _.template(fixCross, { feedback: 'O' }),
 
-  /*
-   * Initialize the Experiment with some more Event Listeners:
-   *
-   * - start/endTrial: add checkToSlow, which checks if the User is to slow
-   *   with his answer; endTrial removes this setTimeout if s/he was not
-   *
-   * - endBlock: add endBlock, which gives some Feedback about the average
-   *   reaction time of the block the User has just finished
-   *
-   * - timedOut: add negativeFeedback; if the User really was to slow, draw
-   *   negative Feedback (red X)
-   *
-   * - queryAnswer: add checkAnswer; queryAnswer is triggered
-   *   by the Experiment Template in the onKeyPress method, that is,
-   *   when the User gives his answer. checkAnswer triggers ...
-   *
-   * - giveFeedback: which draws Feedback as a function of the given answer
-   *
-   */
-
-  initialize: function() {
-    this.extend('initialize', this);
-
-    this.on('startTrial', this.checkToSlow);
-    this.on('endTrial', this.clearToSlow);
-
-    this.on('endBlock', this.endBlock);
-
-    this.on('timedOut', this.negativeFeedback);
-    this.on('queryAnswer', this.checkAnswer);
-    this.on('giveFeedback', this.giveFeedback);
-  },
-
-  /* 
+  /**************************************************************************
    * Trial specific methods:
    *
-   * - starTrial just starts the trial, or ends the experiment if
-   *   there are no stimuli left
+   * - starTrial just starts the trial, starts a Feedback Block or
+   *   ends the experiment if there are no stimuli left
    * - prepareStim operates on the stimuli as a function of the
-   *   conditions and the specific order they should be presented
+   *   conditions and the specific order they should be presented in
    * - showFixCross shows the fixation Cross for the time of the ISI
    *
    * - giveFeedback checks if the User has given the right answer (as
    *   indicated by the isRight property, which is set by the checkAnswer
    *   method, and either draws positive (green O) or negative (red X) Feedback
-   */
+   **************************************************************************/
 
   startTrial: function() {
+    this.extend('startTrial', this);
+    this.checkToSlow();
+
     if (_.isEmpty(this.stimuli)) {
-      this.trigger('endExperiment');
-      return;
+      this.finish();
     }
-    var next = this.prepareStim();
-    this.changeStim(next.stim);
+    var stim = this.prepareStim();
+    if (stim == 'block') {
+      this.endBlock();
+    }
+    else {
+      this.changeStim(stim);
+    }
   },
 
   prepareStim: function() {
-    if (!_.isArray(this.order)) { _.shuffle(this.stimuli); }
+    if (!_.isArray(this.order)) {
+      _.shuffle(this.stimuli);
+    }
     this.curStim = this.keys.shift() % 2 === 0 ? 'f' : 'h';
-    return { stim: this.stimuli.shift() };
+    return this.stimuli.shift();
   },
 
   showfixCross: function() {
@@ -110,9 +87,73 @@ var Flanker = ExperimentTemplate.extend({
     this.clearFeedback();
     this.changeStim(this.fixCross);
     setTimeout(function() {
-      self.trigger('startTrial');
+      self.startTrial();
     }, this.ISI);
   },
+
+  hasTimedOut: function() {
+    this.negativeFeedback();
+    this.endRecording(null);
+  },
+
+  drawFeedback: function(type) {
+    var self = this;
+    if (type.indexOf('pos') !== -1) {
+      this.changeStim(this.posFeedback);
+      this.changeStimColor('green');
+    }
+    else {
+      this.changeStim(this.negFeedback);
+      this.changeStimColor('red');
+    }
+    this.fbTimeout = setTimeout(function() {
+      self.showfixCross();
+    }, this.feedbackTime);
+  },
+
+  checkAnswer: function(answer) {
+    var isRight = (answer == this.curStim);
+    this.set('isRight', isRight);
+
+    this.removeKeyEvents();
+    this.clearToSlow();
+    this.giveFeedback();
+  },
+
+  checkToSlow: function() {
+    var self = this;
+    this.check = setTimeout(function() {
+      self.hasTimedOut();
+    }, this.timeout);
+  },
+
+  endBlock: function() {
+    var self = this;
+    this.clearToSlow();
+    this.removeKeyEvents();
+
+    var fb = { mean: this.computeFeedback() };
+    this.changeStim(_.template(this.feedback, fb));
+
+    $(window).on('keyup', function(ev) {
+      var code = ev.keyCode || ev.which;
+      if (code == 32) {
+        $(window).unbind('keyup');
+        self.startTrial();
+      }
+    });
+  },
+
+  finish: function() {
+    this.extend('finish', this);
+    this.clearFeedback();
+    this.clearToSlow();
+    this.removeKeyEvents();
+  },
+
+  /*
+   * semantic utility function
+   */
 
   giveFeedback: function() {
     this.get('isRight') ? this.positiveFeedback() :
@@ -127,54 +168,20 @@ var Flanker = ExperimentTemplate.extend({
     this.drawFeedback('posFeedback');
   },
 
-  drawFeedback: function(type) {
-    var self = this;
-    if (type.indexOf('pos') !== -1) {
-      this.changeStim(this.posFeedback);
-      this.changeColor('green');
-    }
-    else {
-      this.changeStim(this.negFeedback);
-      this.changeColor('red');
-    }
-    this.fbTimeout = setTimeout(function() {
-      self.showfixCross();
-    }, this.feedbackTime);
-  },
-
-  checkAnswer: function(options) {
-    var isRight = options.pressed == this.curStim;
-    this.set('isRight', isRight);
-    this.trigger('endTrial');
-    this.trigger('giveFeedback');
-  },
-
-  checkToSlow: function() {
-    var self = this;
-    this.check = setTimeout(function() {
-      self.trigger('timedOut');
-    }, this.timeout);
+  clearFeedback: function() {
+    clearTimeout(this.fbTimeout);
   },
 
   clearToSlow: function() {
     clearTimeout(this.check);
   },
 
-  clearFeedback: function() {
-    clearTimeout(this.fbTimeout);
-  },
-
-  changeColor: function(color) {
+  changeStimColor: function(color) {
     $('.feedback').css('color', color);
   },
 
   changeStim: function(file) {
     $('.page').html(file);
-  },
-
-  endBlock: function() {
-    var fb = { mean: this.computeFeedback() };
-    this.changeStim(_.template(this.feedback, fb));
   }
 
 });
