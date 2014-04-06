@@ -7,6 +7,7 @@ var Router       = require('./routers/Router');
 var Instruction  = require('./views/Instruction');
 var Questions    = require('./views/Questions');
 var Experiment   = require('./views/Experiment');
+var Debriefing   = require('./views/Debriefing');
 
 Router.on('route:instruction', function() {
   var instruction = new Instruction();
@@ -21,6 +22,11 @@ Router.on('route:questions', function() {
 Router.on('route:exp', function() {
   var experiment = new Experiment();
   experiment.render();
+});
+
+Router.on('route:debriefing', function() {
+  var debriefing = new Debriefing();
+  debriefing.render();
 });
 
 Backbone.history.start();

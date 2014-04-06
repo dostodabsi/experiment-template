@@ -6,7 +6,8 @@ var Router = Backbone.Router.extend({
   routes: {
     ''          : 'instruction',
     'questions' : 'questions',
-    'exp'       : 'exp'
+    'exp'       : 'exp',
+    'debriefing': 'debriefing'
   },
 
 });

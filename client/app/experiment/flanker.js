@@ -1,53 +1,33 @@
-var fs = require('fs');
 var $  = require('jquery');
 var _  = require('underscore');
 var ExperimentTemplate = require('./template');
 
-var flanker = fs.readFileSync(
-    __dirname + '/stimuli/flanker.html', 'utf-8');
-var fixCross = fs.readFileSync(
-    __dirname + '/stimuli/fixCross.html', 'utf-8');
-var feedback = fs.readFileSync(
-    __dirname + '/stimuli/feedback.html', 'utf-8');
 
-var comp = _.template(flanker, { outer: 'h', inner: 'h' });
-var incomp = _.template(flanker, { outer: 'h', inner: 'f' });
+function Flanker(config, callback) {
 
-var files = {
-  1: comp,
-  2: incomp,
-  3: comp,
-  4: incomp,
-  5: 'block',
-  7: comp,
-  8: incomp,
-  9: comp,
-  10: incomp
-};
+  this.ISI          = config.ISI || 500;
+  this.timeout      = config.timeout || 1500;
+  this.feedbackTime = config.feedbackTime || 1000;
 
-function Flanker() {
+  this.stimuli       = config.stimuli;
+  this.fixCross      = config.fixCross;
+  this.participant   = config.participant;
+  this.negFeedback   = config.negFeedback || 'X';
+  this.posFeedback   = config.posFeedback || 'O';
+  this.blockFeedback = config.blockFeedback || 'Hurry up!';
 
-  this.order = true;
-  this.timeout = 1500;
-  this.feedbackTime = 1000;
-
-  this.curStim = undefined;
-  this.keys = _.keys(files);
-  this.stimuli = _.values(files);
-  this.mainKeys = { 'f': 70, 'h': 72 };
-
-  this.feedback = feedback;
-  this.fixCross = _.template(fixCross, { feedback: '+' });
-  this.negFeedback = _.template(fixCross, { feedback: 'X' });
-  this.posFeedback = _.template(fixCross, { feedback: 'O' });
+  this.curStim  = undefined;
+  this.keys     = _.keys(this.stimuli);
+  this.values   = _.values(this.stimuli);
+  this.mainKeys = config.mainKeys || { 'f': 70, 'h': 72 };
 
   /**************************************************************************
    * Trial specific methods:
    *
-   * - starTrial just starts the trial, starts a Feedback Block or
-   *   ends the experiment if there are no stimuli left
+   * - starTrial just starts the trial or starts a Feedback Block
    * - prepareStim operates on the stimuli as a function of the
-   *   conditions and the specific order they should be presented in
+   *   conditions and the specific order they should be presented in;
+   *   ends the Experiment if no stimuli are left
    * - showFixCross shows the fixation Cross for the time of the ISI
    *
    * - giveFeedback checks if the User has given the right answer (as
@@ -56,13 +36,10 @@ function Flanker() {
    **************************************************************************/
 
   this.startTrial = function() {
+    //this.checkToSlow
     this.extend('startTrial', this);
-    //this.checkToSlow();
-
-    if (_.isEmpty(this.stimuli)) {
-      this.finish();
-    }
     var stim = this.prepareStim();
+
     if (stim == 'block') {
       this.endBlock();
     }
@@ -72,11 +49,14 @@ function Flanker() {
   };
 
   this.prepareStim = function() {
+    if (_.isEmpty(this.values)) {
+      this.finish();
+    }
     if (!_.isArray(this.order)) {
-      _.shuffle(this.stimuli);
+      _.shuffle(this.values);
     }
     this.curStim = this.keys.shift() % 2 === 0 ? 'f' : 'h';
-    return this.stimuli.shift();
+    return this.values.shift();
   };
 
   this.showfixCross = function() {
@@ -113,7 +93,7 @@ function Flanker() {
     this.set('isRight', isRight);
 
     this.removeKeyEvents();
-    this.clearToSlow();
+    //this.clearToSlow();
     this.giveFeedback();
   };
 
@@ -126,11 +106,11 @@ function Flanker() {
 
   this.endBlock = function() {
     var self = this;
-    this.clearToSlow();
+    //this.clearToSlow();
     this.removeKeyEvents();
 
     var mean = this.computeFeedback().toFixed(2);
-    this.changeStim(_.template(this.feedback, { mean: mean }));
+    this.changeStim(_.template(this.blockFeedback, { mean: mean }));
 
     $(window).on('keyup', $.proxy(this.onBlockEnd, this));
   };
@@ -148,10 +128,11 @@ function Flanker() {
     this.clearFeedback();
     this.clearToSlow();
     this.removeKeyEvents();
+    callback();
   };
 
   /*
-   * semantic utility function
+   * semantic utility functions
    */
 
   this.giveFeedback = function() {

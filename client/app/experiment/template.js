@@ -1,7 +1,6 @@
 var $        = require('jquery');
 var _        = require('underscore');
 var utils    = require('../utils');
-var Participant = require('../models/Participant');
 
 function ExperimentTemplate() {
   // no private stuff
@@ -10,21 +9,19 @@ function ExperimentTemplate() {
 ExperimentTemplate.prototype = {
 
   defaults: {
-    trials: [],
-    start: undefined,
-    isRight: undefined,
-    quitter: false,
-    changedTab: false,
-    changedSize: false
+    trials      : [],
+    quitter     : false,
+    changedTab  : false,
+    changedSize : false,
+    start       : undefined,
+    isRight     : undefined
   },
 
-  ISI: 500,
-  random: true,
-  participant: Participant,
-  stimuli: 'please override',
-  feedback: 'please override',
-  fixCross: 'please override',
-  mainKeys: 'please override',
+  stimuli     : 'please override',
+  feedback    : 'please override',
+  fixCross    : 'please override',
+  mainKeys    : 'please override',
+  participant : 'please override',
 
   initialize: function() {
     this.userKeyPress = _.partial(this.onKeyPress, this.mainKeys);
