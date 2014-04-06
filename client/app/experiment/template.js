@@ -1,12 +1,13 @@
 var $        = require('jquery');
 var _        = require('underscore');
 var utils    = require('../utils');
-var Backbone = require('backbone');
 var Participant = require('../models/Participant');
-Backbone.$   = $;
 
+function ExperimentTemplate() {
+  // no private stuff
+}
 
-var ExperimentTemplate = Backbone.Model.extend({
+ExperimentTemplate.prototype = {
 
   defaults: {
     trials: [],
@@ -23,10 +24,10 @@ var ExperimentTemplate = Backbone.Model.extend({
   stimuli: 'please override',
   feedback: 'please override',
   fixCross: 'please override',
-  binaryMap: 'please override',
+  mainKeys: 'please override',
 
   initialize: function() {
-    this.userKeyPress = _.partial(this.onKeyPress, this.binaryMap);
+    this.userKeyPress = _.partial(this.onKeyPress, this.mainKeys);
   },
 
   extend: function(func, context) {
@@ -34,10 +35,11 @@ var ExperimentTemplate = Backbone.Model.extend({
   },
 
   startExperiment: function() {
+    this.initialize();
     this.addTabCheck();
     this.addWindowCheck();
     this.leftExperiment();
-    this.startTrial();
+    this.showfixCross();
   },
 
   /*
@@ -64,16 +66,9 @@ var ExperimentTemplate = Backbone.Model.extend({
   },
 
   endRecording: function(pressed, start) {
-    var save;
-    if (pressed === null) {
-      save = { reaction: 'too slow' };
-    }
-    else {
-      var time = +new Date() - start;
-      var obj = _.object([pressed], [time]);
-      save = _.extend(obj, { isRight: this.get('isRight') });
-    }
-
+    var time = +new Date() - start;
+    var obj  = _.object([pressed], [time]);
+    var save = _.extend(obj, { isRight: this.get('isRight') });
     this.get('trials').push(save);
   },
 
@@ -94,13 +89,13 @@ var ExperimentTemplate = Backbone.Model.extend({
    * - leftExperiment: check if the User leaves the experiment, warn her
    ***********************************************************************/
 
-  onKeyPress: function(binaryMap, ev) {
+  onKeyPress: function(mainKeys, ev) {
     var code = ev.keyCode || ev.which;
-    var map  = _.map(binaryMap, function(val, key) {
+    var map  = _.map(mainKeys, function(val, key) {
       if (val == code) return key;
     });
     var pressed = _.first(_.filter(map, Boolean));
-    if (!_.isEmpty(pressed)) {
+    if (pressed) {
       this.checkAnswer(pressed);
       this.endRecording(pressed, this.get('start'));
     }
@@ -146,10 +141,18 @@ var ExperimentTemplate = Backbone.Model.extend({
 
   finish: function() {
     $(window).unbind('beforeunload');
-    var exp = _.omit(this.attributes, ['start', 'isRight']);
+    var exp = _.omit(this.get('all'), ['start', 'isRight']);
     this.participant.save({ exp: exp });
-  }
+  },
 
-});
+  get: function(el) {
+    return el === 'all' ? this.defaults : this.defaults[el];
+  },
+
+  set: function(key, val) {
+    this.defaults[key] = val;
+  },
+
+};
 
 module.exports = ExperimentTemplate;

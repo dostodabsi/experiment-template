@@ -1,9 +1,7 @@
-var fs       = require('fs');
-var $        = require('jquery');
-var _        = require('underscore');
-var Backbone = require('backbone');
+var fs = require('fs');
+var $  = require('jquery');
+var _  = require('underscore');
 var ExperimentTemplate = require('./template');
-Backbone.$   = $;
 
 var flanker = fs.readFileSync(
     __dirname + '/stimuli/flanker.html', 'utf-8');
@@ -27,22 +25,21 @@ var files = {
   10: incomp
 };
 
+function Flanker() {
 
-var Flanker = ExperimentTemplate.extend({
+  this.order = true;
+  this.timeout = 1500;
+  this.feedbackTime = 1000;
 
-  order: true,
-  timeout: 1500,
-  feedbackTime: 1000,
+  this.curStim = undefined;
+  this.keys = _.keys(files);
+  this.stimuli = _.values(files);
+  this.mainKeys = { 'f': 70, 'h': 72 };
 
-  curStim: undefined,
-  keys: _.keys(files),
-  stimuli: _.values(files),
-  binaryMap: { 'f': 70, 'h': 72 },
-
-  feedback: feedback,
-  fixCross: _.template(fixCross, { feedback: '+' }),
-  negFeedback: _.template(fixCross, { feedback: 'X' }),
-  posFeedback: _.template(fixCross, { feedback: 'O' }),
+  this.feedback = feedback;
+  this.fixCross = _.template(fixCross, { feedback: '+' });
+  this.negFeedback = _.template(fixCross, { feedback: 'X' });
+  this.posFeedback = _.template(fixCross, { feedback: 'O' });
 
   /**************************************************************************
    * Trial specific methods:
@@ -58,9 +55,9 @@ var Flanker = ExperimentTemplate.extend({
    *   method, and either draws positive (green O) or negative (red X) Feedback
    **************************************************************************/
 
-  startTrial: function() {
+  this.startTrial = function() {
     this.extend('startTrial', this);
-    this.checkToSlow();
+    //this.checkToSlow();
 
     if (_.isEmpty(this.stimuli)) {
       this.finish();
@@ -72,31 +69,31 @@ var Flanker = ExperimentTemplate.extend({
     else {
       this.changeStim(stim);
     }
-  },
+  };
 
-  prepareStim: function() {
+  this.prepareStim = function() {
     if (!_.isArray(this.order)) {
       _.shuffle(this.stimuli);
     }
     this.curStim = this.keys.shift() % 2 === 0 ? 'f' : 'h';
     return this.stimuli.shift();
-  },
+  };
 
-  showfixCross: function() {
+  this.showfixCross = function() {
     var self = this;
     this.clearFeedback();
     this.changeStim(this.fixCross);
     setTimeout(function() {
       self.startTrial();
     }, this.ISI);
-  },
+  };
 
-  hasTimedOut: function() {
+  this.hasTimedOut = function() {
     this.negativeFeedback();
     this.endRecording(null);
-  },
+  };
 
-  drawFeedback: function(type) {
+  this.drawFeedback = function(type) {
     var self = this;
     if (type.indexOf('pos') !== -1) {
       this.changeStim(this.posFeedback);
@@ -109,81 +106,84 @@ var Flanker = ExperimentTemplate.extend({
     this.fbTimeout = setTimeout(function() {
       self.showfixCross();
     }, this.feedbackTime);
-  },
+  };
 
-  checkAnswer: function(answer) {
+  this.checkAnswer = function(answer) {
     var isRight = (answer == this.curStim);
     this.set('isRight', isRight);
 
     this.removeKeyEvents();
     this.clearToSlow();
     this.giveFeedback();
-  },
+  };
 
-  checkToSlow: function() {
+  this.checkToSlow = function() {
     var self = this;
     this.check = setTimeout(function() {
       self.hasTimedOut();
     }, this.timeout);
-  },
+  };
 
-  endBlock: function() {
+  this.endBlock = function() {
     var self = this;
     this.clearToSlow();
     this.removeKeyEvents();
 
-    var fb = { mean: this.computeFeedback() };
-    this.changeStim(_.template(this.feedback, fb));
+    var mean = this.computeFeedback().toFixed(2);
+    this.changeStim(_.template(this.feedback, { mean: mean }));
 
-    $(window).on('keyup', function(ev) {
-      var code = ev.keyCode || ev.which;
-      if (code == 32) {
-        $(window).unbind('keyup');
-        self.startTrial();
-      }
-    });
-  },
+    $(window).on('keyup', $.proxy(this.onBlockEnd, this));
+  };
 
-  finish: function() {
+  this.onBlockEnd = function(ev) {
+    var code = ev.keyCode || ev.which;
+    if (code === 32) {
+      $(window).unbind('keyup');
+      this.showfixCross();
+    }
+  };
+
+  this.finish = function() {
     this.extend('finish', this);
     this.clearFeedback();
     this.clearToSlow();
     this.removeKeyEvents();
-  },
+  };
 
   /*
    * semantic utility function
    */
 
-  giveFeedback: function() {
+  this.giveFeedback = function() {
     this.get('isRight') ? this.positiveFeedback() :
                           this.negativeFeedback();
-  },
+  };
 
-  negativeFeedback: function() {
+  this.negativeFeedback = function() {
     this.drawFeedback('negFeedback');
-  },
+  };
 
-  positiveFeedback: function() {
+  this.positiveFeedback = function() {
     this.drawFeedback('posFeedback');
-  },
+  };
 
-  clearFeedback: function() {
+  this.clearFeedback = function() {
     clearTimeout(this.fbTimeout);
-  },
+  };
 
-  clearToSlow: function() {
+  this.clearToSlow = function() {
     clearTimeout(this.check);
-  },
+  };
 
-  changeStimColor: function(color) {
+  this.changeStimColor = function(color) {
     $('.feedback').css('color', color);
-  },
+  };
 
-  changeStim: function(file) {
+  this.changeStim = function(file) {
     $('.page').html(file);
-  }
+  };
 
-});
+}
 
+Flanker.prototype = ExperimentTemplate.prototype;
 module.exports = Flanker;
