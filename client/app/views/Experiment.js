@@ -15,8 +15,8 @@ var feedback = fs.readFileSync(
 
 var ExperimentView = Backbone.View.extend({
 
-  comp       : _.template(flanker, { outer: 'h', inner: 'h' }),
-  incomp     : _.template(flanker, { outer: 'h', inner: 'f' }),
+  comp       : _.template(flanker, { outer: 'H', inner: 'H' }),
+  incomp     : _.template(flanker, { outer: 'H', inner: 'S' }),
 
   initialize: function() {
 

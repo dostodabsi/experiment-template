@@ -14,7 +14,7 @@ ExperimentTemplate.prototype = {
     changedTab  : false,
     changedSize : false,
     start       : undefined,
-    isRight     : undefined
+    correct     : undefined
   },
 
   stimuli     : 'please override',
@@ -63,20 +63,33 @@ ExperimentTemplate.prototype = {
   },
 
   endRecording: function(pressed, start) {
-    var time = +new Date() - start;
-    var obj  = _.object([pressed], [time]);
-    var save = _.extend(obj, { isRight: this.get('isRight') });
-    this.get('trials').push(save);
+    var response = pressed || 'too slow';
+    var time     = pressed ? +new Date() - start : 1500;
+    var correct  = pressed ? this.get('correct') : false;
+
+    this.get('trials').push({ time: time,
+                              response: response, correct: correct });
+  },
+
+  sum: function(array) {
+    return _.reduce(array, function(a, b) {
+      return a + b;
+    }, 0);
   },
 
   computeFeedback: function() {
     var trials = this.get('trials');
-    var add = function(a, b) { return a + b; };
-    var isNumber = function(e) { return !_.isBoolean(e); };
-    var reactionTimes = _.filter(_.flatten(_.map(trials, _.values)), isNumber);
-    var mean = _.reduce(reactionTimes, add, 0);
-    return mean / trials.length;
+    var rTimes = _.pluck(trials, 'time');
+
+    var meanRT     = this.sum(rTimes) / rTimes.length;
+    var errorCount = _.where(trials, { correct: false }).length;
+
+    return {
+      errorCount: errorCount,
+      meanRT: meanRT.toFixed(2)
+    };
   },
+
 
   /**********************************************************************
    * Methods that are important for the User Interaction:
@@ -133,12 +146,12 @@ ExperimentTemplate.prototype = {
   },
 
   removeKeyEvents: function() {
-    $(window).unbind('keyup', this.userKeyPress);
+    $(window).unbind('keyup');
   },
 
   finish: function() {
     $(window).unbind('beforeunload');
-    var exp = _.omit(this.get('all'), ['start', 'isRight']);
+    var exp = _.omit(this.get('all'), ['start', 'correct']);
     this.participant.save({ exp: exp });
   },
 
