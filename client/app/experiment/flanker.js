@@ -7,6 +7,7 @@ function Flanker(config, callback) {
 
   this.ISI          = config.ISI || 500;
   this.timeout      = config.timeout || 1500;
+  this.pauseTime    = config.pauseTime || 200;
   this.feedbackTime = config.feedbackTime || 1000;
 
   this.stimuli       = config.stimuli;
@@ -16,37 +17,27 @@ function Flanker(config, callback) {
   this.posFeedback   = config.posFeedback || 'O';
   this.blockFeedback = config.blockFeedback || 'Hurry up!';
 
-  this.curStim  = undefined;
-  this.keys     = _.keys(this.stimuli);
-  this.values   = _.values(this.stimuli);
-  this.mainKeys = config.mainKeys || { 's': 83, 'h': 72 };
+  this.curStim      = undefined;
+  this.keys         = _.keys(this.stimuli);
+  this.values       = _.values(this.stimuli);
+  this.responseKeys = config.responseKeys || { 's': 83, 'h': 72 };
 
-  /**************************************************************************
-   * Trial specific methods:
-   *
-   * - starTrial just starts the trial or starts a Feedback Block
-   * - prepareStim operates on the stimuli as a function of the
-   *   conditions and the specific order they should be presented in;
-   *   ends the Experiment if no stimuli are left
-   * - showFixCross shows the fixation Cross for the time of the ISI
-   *
-   * - giveFeedback checks if the User has given the right answer (as
-   *   indicated by the correct property, which is set by the checkAnswer
-   *   method, and either draws positive (green O) or negative (red X) Feedback
-   **************************************************************************/
+
+  this.startExperiment = function() {
+    this.extend('startExperiment', this);
+    this.showfixCross();
+  },
+
 
   this.startTrial = function() {
     this.extend('startTrial', this);
     this.checkToSlow();
     var stim = this.prepareStim();
 
-    if (stim == 'block') {
-      this.endBlock();
-    }
-    else {
-      this.changeStim(stim);
-    }
+    stim === 'block' ? this.endBlock() :
+                       this.changeStim(stim);
   };
+
 
   this.prepareStim = function() {
     if (_.isEmpty(this.values)) {
@@ -59,58 +50,47 @@ function Flanker(config, callback) {
     return this.values.shift();
   };
 
+
   this.showfixCross = function() {
-    var self = this;
-    this.clearFeedback();
+    clearTimeout(this.fbTimeout);
     this.changeStim(this.fixCross);
-    setTimeout(function() {
-      self.startTrial();
-    }, this.ISI);
+    this.delay(this.startTrial, this.ISI);
   };
+
 
   this.drawFeedback = function(type) {
-    var self = this;
-    if (type.indexOf('pos') !== -1) {
-      this.changeStim(this.posFeedback);
-      this.changeStimColor('green');
-    }
-    else {
-      this.changeStim(this.negFeedback);
-      this.changeStimColor('red');
-    }
-    this.fbTimeout = setTimeout(function() {
-      self.showfixCross();
-    }, this.feedbackTime);
+    var pos      = (type === 'positive');
+    var color    = pos ? 'green' : 'red';
+    var feedback = pos ? this.posFeedback : this.negFeedback;
+
+    this.changeStim(feedback);
+    this.changeStimColor(color);
+    this.fbTimeout = this.delay(this.pause, this.feedbackTime);
   };
+
 
   this.checkAnswer = function(answer) {
-    var correct = (answer == this.curStim);
+    var correct = (answer === this.curStim);
     this.set('correct', correct);
 
-    this.clearToSlow();
+    clearTimeout(this.tooSlowTimeout);
     this.removeKeyEvents();
 
-    correct ? this.positiveFeedback() :
-              this.negativeFeedback();
+    correct ? this.drawFeedback('positive') :
+              this.drawFeedback('negative');
   };
+
 
   this.hasTimedOut = function() {
-    this.clearToSlow();
+    clearTimeout(this.tooSlowTimeout);
     this.removeKeyEvents();
     this.endRecording(null);
-    this.negativeFeedback();
+    this.drawFeedback('negative');
   };
 
-  this.checkToSlow = function() {
-    var self = this;
-    this.check = setTimeout(function() {
-      self.hasTimedOut();
-    }, this.timeout);
-  };
 
   this.endBlock = function() {
-    var self = this;
-    this.clearToSlow();
+    clearTimeout(this.tooSlowTimeout);
     this.removeKeyEvents();
 
     var fb  = this.computeFeedback();
@@ -120,6 +100,7 @@ function Flanker(config, callback) {
     $(window).on('keyup', $.proxy(this.onBlockEnd, this));
   };
 
+
   this.onBlockEnd = function(ev) {
     var code = ev.keyCode || ev.which;
     if (code === 32) {
@@ -128,37 +109,31 @@ function Flanker(config, callback) {
     }
   };
 
+
   this.finish = function() {
     this.extend('finish', this);
-    this.clearFeedback();
-    this.clearToSlow();
-    this.removeKeyEvents();
+    clearTimeout(this.fbTimeout);
+    clearTimeout(this.pauseTimeout);
+    clearTimeout(this.tooSlowTimeout);
     callback();
   };
 
-  /*
-   * semantic utility functions
-   */
 
-  this.negativeFeedback = function() {
-    this.drawFeedback('negFeedback');
+  this.checkToSlow = function() {
+    this.tooSlowTimeout = this.delay(this.hasTimedOut, this.timeout);
   };
 
-  this.positiveFeedback = function() {
-    this.drawFeedback('posFeedback');
-  };
 
-  this.clearFeedback = function() {
-    clearTimeout(this.fbTimeout);
-  };
+  this.pause = function() {
+    this.changeStim('');
+    this.pauseTimeout = this.delay(this.showfixCross, this.pauseTime);
+  },
 
-  this.clearToSlow = function() {
-    clearTimeout(this.check);
-  };
 
   this.changeStimColor = function(color) {
     $('.feedback').css('color', color);
   };
+
 
   this.changeStim = function(file) {
     $('.page').html(file);

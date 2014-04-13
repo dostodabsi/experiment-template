@@ -1,7 +1,10 @@
-var nano   = require('nano')('http://localhost:5984');
-var db     = nano.use('bakk');
-var getAll = require('./query').all;
+var nano    = require('nano')('http://localhost:5984');
+var db      = nano.use('bakk');
+var queries = require('./queries');
 
-db.insert(getAll, '_design/bakk', function(err, res) {
-  console.log('inserted!');
+
+db.insert(queries, '_design/bakk', function(err, res) {
+  if (!err) {
+    console.log('inserted queries');
+  }
 });

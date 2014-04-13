@@ -2,7 +2,7 @@ var fs           = require('fs');
 var _            = require('underscore');
 var $            = require('jquery');
 var Backbone     = require('backbone');
-var participant  = require('../models/Participant');
+var Participant  = require('../models/Participant');
 Backbone.$ = $;
 
 var questions = fs.readFileSync(
@@ -11,7 +11,7 @@ var questions = fs.readFileSync(
 var Questions = Backbone.View.extend({
 
   el: '.page',
-  participant: participant,
+  participant: Participant,
   template: _.template(questions),
 
   events: {

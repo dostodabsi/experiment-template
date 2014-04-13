@@ -8,7 +8,7 @@ function ExperimentTemplate() {
 
 ExperimentTemplate.prototype = {
 
-  defaults: {
+  data: {
     trials      : [],
     quitter     : false,
     changedTab  : false,
@@ -17,26 +17,33 @@ ExperimentTemplate.prototype = {
     correct     : undefined
   },
 
-  stimuli     : 'please override',
-  feedback    : 'please override',
-  fixCross    : 'please override',
-  mainKeys    : 'please override',
-  participant : 'please override',
+  stimuli      : 'please override',
+  feedback     : 'please override',
+  fixCross     : 'please override',
+  participant  : 'please override',
+  responseKeys : 'please override',
+
 
   initialize: function() {
-    this.userKeyPress = _.partial(this.onKeyPress, this.mainKeys);
+    this.userKeyPress = _.partial(this.onKeyPress, this.responseKeys);
   },
+
 
   extend: function(func, context) {
     ExperimentTemplate.prototype[func].call(context);
   },
+
+
+  delay: function(func, time) {
+    return setTimeout(_.bind(func, this), time);
+  },
+
 
   startExperiment: function() {
     this.initialize();
     this.addTabCheck();
     this.addWindowCheck();
     this.leftExperiment();
-    this.showfixCross();
   },
 
   /*
@@ -48,19 +55,21 @@ ExperimentTemplate.prototype = {
     this.startRecording();
   },
 
-  prepareStim: function() {},
 
+  prepareStim: function() {},
+  showfixCross: function() {},
+  checkAnswer: function() {},
   changeStim: function(file) {},
 
-  showfixCross: function() {},
-
   /*
-   * Methods for the Recording of the Reaction Time
+   * Methods for recording the Reaction Time and
+   * computation of the feedback - mean RT and error count
    */
 
   startRecording: function() {
     this.set('start', +new Date());
   },
+
 
   endRecording: function(pressed, start) {
     var response = pressed || 'too slow';
@@ -68,14 +77,10 @@ ExperimentTemplate.prototype = {
     var correct  = pressed ? this.get('correct') : false;
 
     this.get('trials').push({ time: time,
-                              response: response, correct: correct });
+                              response: response,
+                              correct: correct });
   },
 
-  sum: function(array) {
-    return _.reduce(array, function(a, b) {
-      return a + b;
-    }, 0);
-  },
 
   computeFeedback: function() {
     var trials = this.get('trials');
@@ -90,26 +95,27 @@ ExperimentTemplate.prototype = {
     };
   },
 
-
   /**********************************************************************
-   * Methods that are important for the User Interaction:
-   * - onKeyPress: provided a map, checks if user gives the right answer
-   * - addTabCheck: check if the User changes the Tab 
-   * - addWindowCheck: check if the User changes the Window Size
-   * - leftExperiment: check if the User leaves the experiment, warn her
+   * Methods that are important for Participant Tracking:
+   *
+   * - onKeyPress:
+   *   provided a resp-code map, checks if user has given the right answer
+   *
+   * - addTabCheck: checks if the User has switchted tabs
+   * - addWindowCheck: checks if the User has changed the window size
+   * - leftExperiment: checks if the User has left the experiment, warn her
+   *
    ***********************************************************************/
 
-  onKeyPress: function(mainKeys, ev) {
+  onKeyPress: function(responseKeys, ev) {
     var code = ev.keyCode || ev.which;
-    var map  = _.map(mainKeys, function(val, key) {
-      if (val == code) return key;
-    });
-    var pressed = _.first(_.filter(map, Boolean));
+    var pressed = _.invert(responseKeys)[code];
     if (pressed) {
       this.checkAnswer(pressed);
       this.endRecording(pressed, this.get('start'));
     }
   },
+
 
   addTabCheck: function() {
     var self = this;
@@ -122,6 +128,7 @@ ExperimentTemplate.prototype = {
     });
   },
 
+
   addWindowCheck: function() {
     var self = this;
     $(window).on('resize', function() {
@@ -130,6 +137,7 @@ ExperimentTemplate.prototype = {
       }
     });
   },
+
 
   leftExperiment: function() {
     var self = this;
@@ -141,26 +149,41 @@ ExperimentTemplate.prototype = {
     });
   },
 
+
   addKeyEvents: function() {
-    $(window).on('keyup', $.proxy(this.userKeyPress, this));
+    $(window).on('keyup', _.bind(this.userKeyPress, this));
   },
+
 
   removeKeyEvents: function() {
     $(window).unbind('keyup');
   },
 
+
   finish: function() {
+    this.removeKeyEvents();
     $(window).unbind('beforeunload');
     var exp = _.omit(this.get('all'), ['start', 'correct']);
-    this.participant.save({ exp: exp });
+
+    !this.participant ? console.log(exp) :
+                        this.participant.save({ exp: exp });
   },
 
-  get: function(el) {
-    return el === 'all' ? this.defaults : this.defaults[el];
+
+  get: function(key) {
+    return key === 'all' ? this.data : this.data[key];
   },
+
 
   set: function(key, val) {
-    this.defaults[key] = val;
+    this.data[key] = val;
+  },
+
+
+  sum: function(array) {
+    return _.reduce(array, function(a, b) {
+      return a + b;
+    }, 0);
   },
 
 };
