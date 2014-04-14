@@ -5,7 +5,7 @@ var Backbone     = require('backbone');
 Backbone.$ = $;
 
 var debriefing = fs.readFileSync(
-    __dirname + '/../templates/debriefing.html', 'utf8');
+    __dirname + '/../templates/debriefing.html', 'utf-8');
 
 var Debriefing = Backbone.View.extend({
 

@@ -2,11 +2,13 @@ var db      = require('./db');
 var express = require('express');
 
 
-var app   = express();
-var files = '../client/static';
-var port  = process.env.PORT || 4000;
+var app    = express();
+var files  = '../client/static';
+var images = '../client/app/experiment/stimuli/images';
+var port   = process.env.PORT || 4000;
 
 app.use(express.static(files));
+app.use(express.static(images));
 app.use(express.urlencoded());
 app.use(express.json());
 app.use(express.methodOverride());

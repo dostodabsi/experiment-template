@@ -6,39 +6,60 @@ var Flanker     = require('../experiment/flanker');
 var Participant = require('../models/Participant');
 Backbone.$ = $;
 
-var flanker = fs.readFileSync(
+
+var flanker  = fs.readFileSync(
     __dirname + '/../experiment/stimuli/flanker.html', 'utf-8');
-var fixCross = fs.readFileSync(
-    __dirname + '/../experiment/stimuli/fixCross.html', 'utf-8');
+
 var feedback = fs.readFileSync(
     __dirname + '/../experiment/stimuli/feedback.html', 'utf-8');
 
-var ExperimentView = Backbone.View.extend({
+var blockFeedback = fs.readFileSync(
+    __dirname + '/../experiment/stimuli/blockFeedback.html', 'utf-8');
 
-  comp       : _.template(flanker, { outer: 'H', inner: 'H' }),
-  incomp     : _.template(flanker, { outer: 'H', inner: 'S' }),
+
+var ExperimentView = Backbone.View.extend({
 
   initialize: function() {
 
     this.stimuli = {
-      1: this.comp,
-      2: this.incomp,
-      3: this.comp,
-      4: this.incomp,
-      5: 'block',
-      7: this.comp,
-      8: this.incomp,
-      9: this.comp,
-      10: this.incomp
-    };
+      onehand: ['hammer.png', 'teapot.png', 'spoon.png', 'jesus.png',
+                'knife.png', 'fork.png', 'shoe.png', 'ketchup.png'],
+      twohand: ['congress.png', 'heartbleed.png', 'rake.png', 'car.png',
+                'carussell.png', 'einstein.png', 'laptop.png', 'linux.png'],
+
+      congrH   : _.template(flanker, { flanker: 'HHHHHHH' }),
+      congrS   : _.template(flanker, { flanker: 'SSSSSSS' }),
+      incongrH : _.template(flanker, { flanker: 'SSSHSSS' }),
+      incongrS : _.template(flanker, { flanker: 'HHHSHHH' }),
+
+      trials: [
+          ['onehand', 'congrH', 'no_gap'],
+          ['onehand', 'congrS', 'no_gap'],
+          ['twohand', 'congrH', 'gap'],
+          ['twohand', 'congrS', 'gap'],
+          ['onehand', 'congrH', 'gap'],
+          ['onehand', 'congrS', 'gap'],
+          ['twohand', 'congrH', 'no_gap'],
+          ['twohand', 'congrS', 'no_gap'],
+          ['onehand', 'incongrH', 'no_gap'],
+          ['onehand', 'incongrS', 'no_gap'],
+          ['twohand', 'incongrH', 'gap'],
+          ['twohand', 'incongrS', 'gap'],
+          ['onehand', 'incongrH', 'gap'],
+          ['onehand', 'incongrS', 'gap'],
+          ['twohand', 'incongrH', 'no_gap'],
+          ['twohand', 'incongrS', 'no_gap'],
+        ]
+      };
 
     this.config = {
-      blockFeedback : feedback,
       participant   : Participant,
       stimuli       : this.stimuli,
-      fixCross      : _.template(fixCross, { feedback : '+' }),
-      posFeedback   : _.template(fixCross, { feedback : 'O' }),
-      negFeedback   : _.template(fixCross, { feedback : 'X' }),
+      prime         : _.partial(_.template(feedback)),
+      blockFeedback : _.partial(_.template(blockFeedback)),
+      fixCross      : _.template(feedback, { feedback : '+', color: 'white' }),
+      posFeedback   : _.template(feedback, { feedback : 'O', color: 'green' }),
+      negFeedback   : _.template(feedback, { feedback : 'X', color: 'red' }),
     };
 
     // callback are the new GOTOs ...

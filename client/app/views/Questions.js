@@ -6,7 +6,7 @@ var Participant  = require('../models/Participant');
 Backbone.$ = $;
 
 var questions = fs.readFileSync(
-    __dirname + '/../templates/questions.html', 'utf8');
+    __dirname + '/../templates/questions.html', 'utf-8');
 
 var Questions = Backbone.View.extend({
 

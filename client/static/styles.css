@@ -33,26 +33,12 @@ body {
 .flanker-stim {
 	color: white;
 	margin-top: 30%;
-}
-
-.flanker-stim td {
-	padding: 50px;
 	font-size: 50px;
 	text-align: center;
+	letter-spacing: 0px;
 }
 
-.otherFeedback {
-	color: black;
-}
-
-.feedback {
-	color: white;
-}
-
-.negativeFeedback {
-	color: red;
-}
-
-.positiveFeedback: {
-	color: green;
+.prime {
+	width: 500px;
+	height: 500px;
 }

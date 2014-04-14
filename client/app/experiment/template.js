@@ -10,6 +10,7 @@ ExperimentTemplate.prototype = {
 
   data: {
     trials      : [],
+    block       : [],
     quitter     : false,
     changedTab  : false,
     changedSize : false,
@@ -76,18 +77,17 @@ ExperimentTemplate.prototype = {
     var time     = pressed ? +new Date() - start : 1500;
     var correct  = pressed ? this.get('correct') : false;
 
-    this.get('trials').push({ time: time,
-                              response: response,
-                              correct: correct });
+    this.get('block').push({ time: time,
+                             response: response,
+                             correct: correct });
   },
 
 
   computeFeedback: function() {
-    var trials = this.get('trials');
-    var rTimes = _.pluck(trials, 'time');
-
+    var block      = this.get('block');
+    var rTimes     = _.pluck(block, 'time');
     var meanRT     = this.sum(rTimes) / rTimes.length;
-    var errorCount = _.where(trials, { correct: false }).length;
+    var errorCount = _.where(block, { correct: false }).length;
 
     return {
       errorCount: errorCount,
@@ -118,35 +118,27 @@ ExperimentTemplate.prototype = {
 
 
   addTabCheck: function() {
-    var self = this;
-    var vendor = utils.hidden();
-    var changeVis = (vendor == 'hidden' ? '' : vendor) + 'visibilitychange';
-    $(document).on(changeVis, function(ev) {
-      if (!self.get('changedTab')) {
-        self.set('changedTab', true);
-      }
-    });
+    var vendor     = utils.hidden();
+    var hasChanged = function() { this.set('changedTab', true); };
+    var changeVis  = (vendor == 'hidden' ? '' : vendor) + 'visibilitychange';
+    $(document).on(changeVis, _.bind(hasChanged, this));
   },
 
 
   addWindowCheck: function() {
-    var self = this;
-    $(window).on('resize', function() {
-      if (!self.get('changedSize')) {
-        self.set('changedSize', true);
-      }
-    });
+    var hasChanged = function() { this.set('changedSize', true); };
+    $(window).on('resize', _.bind(hasChanged, this));
   },
 
 
   leftExperiment: function() {
-    var self = this;
-    var msg = 'By leaving, you opt out of the Experiment, are you sure?';
-    $(window).on('beforeunload', function() {
-      self.set('quitter', true);
-      self.finish();
+    var msg     = 'By leaving, you opt out of the Experiment, are you sure?';
+    var hasQuit = function() {
+      this.set('quitter', true);
+      this.finish();
       return msg;
-    });
+    };
+    $(window).on('beforeunload', _.bind(hasQuit, this));
   },
 
 
@@ -163,7 +155,7 @@ ExperimentTemplate.prototype = {
   finish: function() {
     this.removeKeyEvents();
     $(window).unbind('beforeunload');
-    var exp = _.omit(this.get('all'), ['start', 'correct']);
+    var exp = _.omit(this.get('all'), ['start', 'correct', 'block']);
 
     !this.participant ? console.log(exp) :
                         this.participant.save({ exp: exp });

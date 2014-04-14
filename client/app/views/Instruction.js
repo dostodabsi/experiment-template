@@ -5,7 +5,7 @@ var Backbone     = require('backbone');
 Backbone.$ = $;
 
 var instruction = fs.readFileSync(
-    __dirname + '/../templates/instruction.html', 'utf8');
+     __dirname + '/../templates/instruction.html', 'utf-8');
 
 var Instruction = Backbone.View.extend({
 
@@ -15,7 +15,7 @@ var Instruction = Backbone.View.extend({
   initialize: function() {
     this.width  = window.innerWidth;
     this.height = window.innerHeight;
-    $(window).on('resize', $.proxy(this.checkResize, this));
+    $(window).on('resize', _.bind(this.checkResize, this));
   },
 
   events: {
