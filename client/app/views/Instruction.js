@@ -39,8 +39,7 @@ var Instruction = Backbone.View.extend({
   },
 
   participate: function(ev) {
-    ev.preventDefault();
-    Backbone.history.navigate('questions', { trigger: true });
+    Backbone.history.navigate('explanation', { trigger: true });
   }
 
 });

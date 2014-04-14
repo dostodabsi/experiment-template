@@ -27,6 +27,7 @@
 
 	"predef": [
 	  "describe",
-	  "alert"
+	  "alert",
+	  "prompt"
 	]
 }

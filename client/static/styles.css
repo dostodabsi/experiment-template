@@ -1,24 +1,50 @@
 body {
 	color: white;
-	width: 800px;
+	width: 60%;
 	margin: 0 auto;
 	background: black;
 }
 
 .container {
-	width: 700px;
+	width: 100%;
 	margin-left: auto;
 	margin-right: auto;
 }
 
 .page {
 	font-size: 20px;
-	margin-top: 10%;
+	margin-top: 5%;
 }
 
-.instruction .debriefing {
+.instruction .debriefing .explanation {
 	margin: 0 auto;
-	width: 800px;
+	width: 80%;
+}
+
+.debriefing {
+	font-size: 24px;
+}
+
+.explanation-heading {
+	cursor: pointer;
+}
+
+.explanation .target {
+	padding: 20px;
+}
+
+.explanation .wide {
+	letter-spacing: 10px;
+}
+
+.explanation .right {
+	color: green;
+	font-size: 24px;
+}
+
+.explanation .wrong {
+	color: red;
+	font-size: 24px;
 }
 
 .questions form .row {
@@ -33,12 +59,28 @@ body {
 .flanker-stim {
 	color: white;
 	margin-top: 30%;
-	font-size: 50px;
+	font-size: 70px;
 	text-align: center;
 	letter-spacing: 0px;
+}
+
+.flanker-feedback {
+	color: white;
+	margin-top: 30%;
+	font-size: 40px;
+	text-align: center;
 }
 
 .prime {
 	width: 500px;
 	height: 500px;
+}
+
+#errors {
+	color: red;
+}
+
+#code {
+	padding-top: 20px;
+	font-size: 30px;
 }

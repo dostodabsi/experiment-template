@@ -132,10 +132,10 @@ ExperimentTemplate.prototype = {
 
 
   leftExperiment: function() {
-    var msg     = 'By leaving, you opt out of the Experiment, are you sure?';
+    var msg = 'By leaving, you opt out of the Experiment, are you sure?';
     var hasQuit = function() {
       this.set('quitter', true);
-      this.finish();
+      this.finish('interrupt');
       return msg;
     };
     $(window).on('beforeunload', _.bind(hasQuit, this));
@@ -152,7 +152,7 @@ ExperimentTemplate.prototype = {
   },
 
 
-  finish: function() {
+  finish: function(interrupt) {
     this.removeKeyEvents();
     $(window).unbind('beforeunload');
     var exp = _.omit(this.get('all'), ['start', 'correct', 'block']);

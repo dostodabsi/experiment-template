@@ -5,6 +5,7 @@ Backbone.$ = $;
 
 var Router       = require('./routers/Router');
 var Instruction  = require('./views/Instruction');
+var Explanation  = require('./views/Explanation');
 var Questions    = require('./views/Questions');
 var Experiment   = require('./views/Experiment');
 var Debriefing   = require('./views/Debriefing');
@@ -12,6 +13,11 @@ var Debriefing   = require('./views/Debriefing');
 Router.on('route:instruction', function() {
   var instruction = new Instruction();
   instruction.render();
+});
+
+Router.on('route:explanation', function() {
+  var explanation = new Explanation();
+  explanation.render();
 });
 
 Router.on('route:questions', function() {

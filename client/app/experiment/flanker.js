@@ -152,12 +152,14 @@ function Flanker(config, callback) {
   };
 
 
-  this.finish = function() {
+  this.finish = function(interrupt) {
     this.extend('finish', this);
-    clearTimeout(this.fbTimeout);
-    clearTimeout(this.pauseTimeout);
-    clearTimeout(this.tooSlowTimeout);
-    callback();
+    if (!interrupt) {
+      clearTimeout(this.fbTimeout);
+      clearTimeout(this.pauseTimeout);
+      clearTimeout(this.tooSlowTimeout);
+      callback();
+    }
   };
 
 
