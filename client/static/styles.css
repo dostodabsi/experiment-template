@@ -12,13 +12,17 @@ body {
 }
 
 .page {
-	font-size: 20px;
+	font-size: 22px;
 	margin-top: 5%;
 }
 
 .instruction .debriefing .explanation {
 	margin: 0 auto;
 	width: 80%;
+}
+
+.instruction .intro {
+	padding-bottom: 30px;
 }
 
 .debriefing {

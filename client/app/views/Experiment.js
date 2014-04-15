@@ -22,10 +22,11 @@ var ExperimentView = Backbone.View.extend({
   initialize: function() {
 
     this.stimuli = {
-      onehand: ['hammer.png', 'teapot.png', 'spoon.png', 'jesus.png',
-                'knife.png', 'fork.png', 'shoe.png', 'ketchup.png'],
-      twohand: ['congress.png', 'heartbleed.png', 'rake.png', 'car.png',
-                'carussell.png', 'einstein.png', 'laptop.png', 'linux.png'],
+      onehand: ['hammer', 'teapot', 'spoon', 'knife',
+                'scissors', 'screwdriver', 'tweezer', 'fork'],
+
+      twohand: ['axe', 'rake', 'shovel', 'reaping hook',
+                'paddle', 'staple gun', 'ladder', 'hand scraper'],
 
       congrH   : _.template(flanker, { flanker: 'HHHHHHH' }),
       congrS   : _.template(flanker, { flanker: 'SSSSSSS' }),
@@ -33,22 +34,25 @@ var ExperimentView = Backbone.View.extend({
       incongrS : _.template(flanker, { flanker: 'HHHSHHH' }),
 
       trials: [
-          ['onehand', 'congrH', 'no_gap'],
-          ['onehand', 'congrS', 'no_gap'],
-          ['twohand', 'congrH', 'gap'],
-          ['twohand', 'congrS', 'gap'],
-          ['onehand', 'congrH', 'gap'],
-          ['onehand', 'congrS', 'gap'],
-          ['twohand', 'congrH', 'no_gap'],
-          ['twohand', 'congrS', 'no_gap'],
-          ['onehand', 'incongrH', 'no_gap'],
-          ['onehand', 'incongrS', 'no_gap'],
-          ['twohand', 'incongrH', 'gap'],
-          ['twohand', 'incongrS', 'gap'],
-          ['onehand', 'incongrH', 'gap'],
-          ['onehand', 'incongrS', 'gap'],
-          ['twohand', 'incongrH', 'no_gap'],
-          ['twohand', 'incongrS', 'no_gap'],
+          ['onehand' , 'congrH'   , 'no_gap' , 'congruent compatible'],
+          ['onehand' , 'congrS'   , 'no_gap' , 'congruent compatible'],
+          ['twohand' , 'congrH'   , 'gap'    , 'congruent compatible'],
+          ['twohand' , 'congrS'   , 'gap'    , 'congruent compatible'],
+
+          ['onehand' , 'congrH'   , 'gap'    , 'congruent incompatible'],
+          ['onehand' , 'congrS'   , 'gap'    , 'congruent incompatible'],
+          ['twohand' , 'congrH'   , 'no_gap' , 'congruent incompatible'],
+          ['twohand' , 'congrS'   , 'no_gap' , 'congruent incompatible'],
+
+          ['onehand' , 'incongrH' , 'no_gap' , 'incongruent compatible'],
+          ['onehand' , 'incongrS' , 'no_gap' , 'incongruent compatible'],
+          ['twohand' , 'incongrH' , 'gap'    , 'incongruent compatible'],
+          ['twohand' , 'incongrS' , 'gap'    , 'incongruent compatible'],
+
+          ['onehand' , 'incongrH' , 'gap'    , 'incongruent incompatible'],
+          ['onehand' , 'incongrS' , 'gap'    , 'incongruent incompatible'],
+          ['twohand' , 'incongrH' , 'no_gap' , 'incongruent incompatible'],
+          ['twohand' , 'incongrS' , 'no_gap' , 'incongruent incompatible'],
         ]
       };
 
@@ -62,14 +66,14 @@ var ExperimentView = Backbone.View.extend({
       negFeedback   : _.template(feedback, { feedback : 'X', color: 'red' }),
     };
 
-    // callback are the new GOTOs ...
+    // callbacks are the new GOTOs ...
     var experiment = new Flanker(this.config, this.whenFinished);
     experiment.startExperiment();
   },
 
   whenFinished: function() {
     Backbone.history.navigate('debriefing', { trigger: true });
-  }
+  },
 
 });
 

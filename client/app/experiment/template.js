@@ -15,7 +15,8 @@ ExperimentTemplate.prototype = {
     changedTab  : false,
     changedSize : false,
     start       : undefined,
-    correct     : undefined
+    correct     : undefined,
+    duration    : undefined
   },
 
   stimuli      : 'please override',
@@ -45,11 +46,13 @@ ExperimentTemplate.prototype = {
     this.addTabCheck();
     this.addWindowCheck();
     this.leftExperiment();
+    this.set('duration', +new Date());
   },
 
-  /*
-   * Methods that should be overriden by the specific Experiment
-   */
+  /***********************************
+   * Methods that should be overriden 
+   * by the specific Experiment
+   **********************************/
 
   startTrial: function() {
     this.addKeyEvents();
@@ -62,24 +65,25 @@ ExperimentTemplate.prototype = {
   checkAnswer: function() {},
   changeStim: function(file) {},
 
-  /*
+  /********************************************
    * Methods for recording the Reaction Time and
-   * computation of the feedback - mean RT and error count
-   */
+   * computation of the feedback - mean RT, error count
+   ********************************************/
 
   startRecording: function() {
     this.set('start', +new Date());
   },
 
 
-  endRecording: function(pressed, start) {
+  endRecording: function(pressed, start, meta) {
     var response = pressed || 'too slow';
     var time     = pressed ? +new Date() - start : 1500;
     var correct  = pressed ? this.get('correct') : false;
+    var save     = { time: time,
+                     response: response,
+                     correct: correct };
 
-    this.get('block').push({ time: time,
-                             response: response,
-                             correct: correct });
+    this.get('block').push(_.extend(save, meta));
   },
 
 
@@ -104,16 +108,12 @@ ExperimentTemplate.prototype = {
    * - addTabCheck: checks if the User has switchted tabs
    * - addWindowCheck: checks if the User has changed the window size
    * - leftExperiment: checks if the User has left the experiment, warn her
-   *
    ***********************************************************************/
 
   onKeyPress: function(responseKeys, ev) {
-    var code = ev.keyCode || ev.which;
+    var code    = ev.keyCode || ev.which;
     var pressed = _.invert(responseKeys)[code];
-    if (pressed) {
-      this.checkAnswer(pressed);
-      this.endRecording(pressed, this.get('start'));
-    }
+    if (pressed) { this.checkAnswer(pressed); }
   },
 
 
@@ -155,10 +155,16 @@ ExperimentTemplate.prototype = {
   finish: function(interrupt) {
     this.removeKeyEvents();
     $(window).unbind('beforeunload');
+    this.set('duration', this.expduration());
     var exp = _.omit(this.get('all'), ['start', 'correct', 'block']);
 
     !this.participant ? console.log(exp) :
                         this.participant.save({ exp: exp });
+  },
+
+
+  expduration: function() {
+    return +new Date() - this.get('duration');
   },
 
 
