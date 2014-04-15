@@ -160,6 +160,7 @@ ExperimentTemplate.prototype = {
 
     !this.participant ? console.log(exp) :
                         this.participant.save({ exp: exp });
+    this.reset();
   },
 
 
@@ -175,6 +176,14 @@ ExperimentTemplate.prototype = {
 
   set: function(key, val) {
     this.data[key] = val;
+  },
+
+
+  reset: function() {
+    this.set('block', []);
+    this.set('quitter', false);
+    this.set('changedTab', false);
+    this.set('changedSize', false);
   },
 
 

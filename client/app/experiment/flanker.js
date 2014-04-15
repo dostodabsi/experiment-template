@@ -10,6 +10,7 @@ function Flanker(config, callback) {
   this.timeout      = config.timeout || 1500;
   this.pauseTime    = config.pauseTime || 500;
   this.primeTime    = config.primeTime || 500;
+  this.practice     = config.practice || false;
   this.feedbackTime = config.feedbackTime || 1000;
 
   this.prime         = config.prime;
@@ -234,7 +235,9 @@ function Flanker(config, callback) {
     this.removeKeyEvents();
 
     var fb       = this.computeFeedback();
-    var feedback = { meanRT: fb.meanRT, errorCount: fb.errorCount };
+    var feedback = { meanRT     : fb.meanRT,
+                     errorCount : fb.errorCount,
+                     practice   : this.practice };
 
     this.blockStart = +new Date();
     this.changeStim(this.blockFeedback(feedback));
@@ -246,9 +249,12 @@ function Flanker(config, callback) {
     var code = ev.keyCode || ev.which;
     if (code === 32) {
       this.removeKeyEvents();
-      this.saveBlockData();
-      this.prepareBlock();
-      this.pause();
+      if (!this.practice) {
+        this.saveBlockData();
+        this.prepareBlock();
+        this.pause();
+      }
+      else { this.finish(); }
     }
   };
 
@@ -321,6 +327,11 @@ function Flanker(config, callback) {
     if (list && _.contains(list, 'gap')) {
       $('.flanker-stim').css('margin-left', '50px');
       $('.flanker-stim').css('letter-spacing', '50px');
+    }
+    if (list && this.practice) {
+      var fb = $('<p id="practice-press">Press {key}</p>'
+                .replace('{key}', this.corrAns.toUpperCase()));
+      $('.page').append(fb);
     }
   };
 

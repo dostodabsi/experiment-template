@@ -1,6 +1,19 @@
 <div class="flanker-feedback">
-	<p>Your average response time is <span><%= meanRT %> ms</span></p>
-	<p>You have made <span><%= errorCount %></span> <span id="errors">errors</span></p>
-	<p>Can you do better?</p>
-	<h2>Press Space Bar and proof it!</h2>
+
+	<% if (practice) { %>
+
+		<div class="practice">
+			<p>You have done very well!</p>
+			<p>Just always press the button in the middle.</p>
+			<p class="prompt">Press Space Bar to start the Experiment</p>
+		</div>
+
+	<% } else { %>
+
+		<p>Your average response time is <span><%= meanRT %> ms</span></p>
+		<p>You have made <span><%= errorCount %></span> <span id="errors">errors</span></p>
+		<p>Can you do better?</p>
+		<p class="prompt">Press Space Bar and proof it!</p>
+	<% } %>
+
 </div>
