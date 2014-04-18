@@ -1,11 +1,11 @@
-var fs           = require('fs');
-var _            = require('underscore');
-var $            = require('jquery');
-var Backbone     = require('backbone');
-Backbone.$ = $;
+var fs          = require('fs');
+var $           = require('jquery');
+var _           = require('underscore');
+var Backbone    = require('backbone');
 
 var explanation = fs.readFileSync(
-     __dirname + '/../templates/explanation.html', 'utf-8');
+    __dirname + '/../templates/explanation.html', 'utf-8');
+
 
 var Explanation = Backbone.View.extend({
 

@@ -1,12 +1,12 @@
-var fs           = require('fs');
-var _            = require('underscore');
-var $            = require('jquery');
-var Backbone     = require('backbone');
-var Participant  = require('../models/Participant');
-Backbone.$ = $;
+var fs          = require('fs');
+var $           = require('jquery');
+var _           = require('underscore');
+var Backbone    = require('backbone');
+var Participant = require('../models/Participant');
 
 var questions = fs.readFileSync(
     __dirname + '/../templates/questions.html', 'utf-8');
+
 
 var Questions = Backbone.View.extend({
 
@@ -26,7 +26,7 @@ var Questions = Backbone.View.extend({
   checkAnswers: function(ev) {
     ev.preventDefault();
     var data = $(ev.currentTarget).serializeObject();
-    if (!(data.sex && data.handedness && data.age)) {
+    if (!(data.sex && data.country && data.age)) {
       alert('Upps, you forgot to answer one or more questions!');
       return false;
     }
@@ -40,6 +40,7 @@ var Questions = Backbone.View.extend({
   getInfo: function() {
     return {
       userAgent: navigator.userAgent,
+      userTime: new Date().toString(),
       windowSize: [window.innerWidth, window.innerHeight]
     };
   },

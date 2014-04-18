@@ -8,9 +8,10 @@ var Participant = Backbone.Model.extend({
   defaults: {
     'age': 0,
     'sex': '',
+    'country': '',
+    'userTime': '',
     'userAgent': '',
-    'windowSize': '',
-    'handedness': ''
+    'windowSize': ''
   }
 
 });

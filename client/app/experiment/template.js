@@ -95,7 +95,7 @@ ExperimentTemplate.prototype = {
 
     return {
       errorCount: errorCount,
-      meanRT: meanRT.toFixed(2)
+      meanRT: Math.round(meanRT)
     };
   },
 

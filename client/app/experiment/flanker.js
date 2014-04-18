@@ -5,7 +5,7 @@ var ExperimentTemplate = require('./template');
 
 function Flanker(config, callback) {
 
-  this.stop         = config.stop || 4;
+  this.stop         = config.stop || 3;
   this.ISI          = config.ISI || 500;
   this.timeout      = config.timeout || 1500;
   this.pauseTime    = config.pauseTime || 500;
@@ -312,6 +312,22 @@ function Flanker(config, callback) {
    * written for clarity.
    ************************************/
 
+  this.changeStim = function(file, list) {
+    $('.page').html(file);
+
+    if (list && _.contains(list, 'gap')) {
+      $('.flanker').css('margin-left', '50px');
+      $('.flanker').css('letter-spacing', '50px');
+    }
+
+    if (list && this.practice) {
+      var fb = $('<p id="practice-press">Press {key}</p>'
+                .replace('{key}', this.corrAns.toUpperCase()));
+      $('.page').append(fb);
+    }
+  };
+
+
   this.checkTooSlow = function() {
     this.tooSlowTimeout = this.delay(this.hasTimedOut, this.timeout);
   };
@@ -322,22 +338,8 @@ function Flanker(config, callback) {
   };
 
 
-  this.changeStim = function(file, list) {
-    $('.page').html(file);
-    if (list && _.contains(list, 'gap')) {
-      $('.flanker-stim').css('margin-left', '50px');
-      $('.flanker-stim').css('letter-spacing', '50px');
-    }
-    if (list && this.practice) {
-      var fb = $('<p id="practice-press">Press {key}</p>'
-                .replace('{key}', this.corrAns.toUpperCase()));
-      $('.page').append(fb);
-    }
-  };
-
-
   this.changeImage = function(img) {
-    this.changeStim('');
+    this.changeStim();
     $('.prime').attr('src', img);
   };
 

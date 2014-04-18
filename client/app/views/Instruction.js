@@ -1,11 +1,11 @@
-var fs           = require('fs');
-var _            = require('underscore');
-var $            = require('jquery');
-var Backbone     = require('backbone');
-Backbone.$ = $;
+var fs          = require('fs');
+var $           = require('jquery');
+var _           = require('underscore');
+var Backbone    = require('backbone');
 
 var instruction = fs.readFileSync(
-     __dirname + '/../templates/instruction.html', 'utf-8');
+    __dirname + '/../templates/instruction.html', 'utf-8');
+
 
 var Instruction = Backbone.View.extend({
 
@@ -15,6 +15,7 @@ var Instruction = Backbone.View.extend({
   initialize: function() {
     this.width  = window.innerWidth;
     this.height = window.innerHeight;
+    $(window).on('keyup', _.bind(this.checkClick, this));
     $(window).on('resize', _.bind(this.checkResize, this));
   },
 
@@ -26,6 +27,11 @@ var Instruction = Backbone.View.extend({
     var fullscreen = (window.innerWidth > this.width &&
                       window.innerHeight > this.height);
     if (fullscreen) { this.showButton(); }
+  },
+
+  checkClick: function(ev) {
+    var code = ev.which || ev.keyCode;
+    if (code == 122) { this.showButton(); }
   },
 
   render: function() {
