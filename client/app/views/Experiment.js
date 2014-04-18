@@ -8,9 +8,6 @@ var Participant = require('../models/Participant');
 var flanker  = fs.readFileSync(
     __dirname + '/../experiment/stimuli/flanker.html', 'utf-8');
 
-var feedback = fs.readFileSync(
-    __dirname + '/../experiment/stimuli/feedback.html', 'utf-8');
-
 var blockFeedback = fs.readFileSync(
     __dirname + '/../experiment/stimuli/blockFeedback.html', 'utf-8');
 
@@ -25,10 +22,10 @@ var ExperimentView = Backbone.View.extend({
       twohand: ['rake'],/*, 'axe', 'shovel', 'reaping hook']*/
                 //'paddle', 'staple gun', 'ladder', 'hand scraper'],
 
-      congrH   : _.template(flanker, { flanker: 'HHHHHHH' }),
-      congrS   : _.template(flanker, { flanker: 'SSSSSSS' }),
-      incongrH : _.template(flanker, { flanker: 'SSSHSSS' }),
-      incongrS : _.template(flanker, { flanker: 'HHHSHHH' }),
+      congrH   : _.template(flanker, { stim: 'HHHHHHH', color: 'white' }),
+      congrS   : _.template(flanker, { stim: 'SSSSSSS', color: 'white' }),
+      incongrH : _.template(flanker, { stim: 'SSSHSSS', color: 'white'  }),
+      incongrS : _.template(flanker, { stim: 'HHHSHHH', color: 'white'  }),
 
       trials: [
         //['onehand' , 'congrH'   , 'no_gap' , 'congruent compatible'],
@@ -56,11 +53,11 @@ var ExperimentView = Backbone.View.extend({
     this.config = {
       participant   : Participant,
       stimuli       : this.stimuli,
-      prime         : _.partial(_.template(feedback)),
+      prime         : _.partial(_.template(flanker)),
       blockFeedback : _.partial(_.template(blockFeedback)),
-      fixCross      : _.template(feedback, { feedback : '+', color: 'white' }),
-      posFeedback   : _.template(feedback, { feedback : 'o', color: 'green' }),
-      negFeedback   : _.template(feedback, { feedback : 'x', color: 'red' }),
+      fixCross      : _.template(flanker, { stim : '+', color: 'white' }),
+      posFeedback   : _.template(flanker, { stim : 'o', color: 'green' }),
+      negFeedback   : _.template(flanker, { stim : 'x', color: 'red' }),
     };
   },
 

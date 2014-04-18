@@ -142,8 +142,8 @@ function Flanker(config, callback) {
 
 
   this.showPrime = function() {
-    var temp = { feedback: this.trial.prime, color: 'none' };
-    this.changeStim(this.prime(temp));
+    var stim = { stim: this.trial.prime, color: 'white' };
+    this.changeStim(this.prime(stim));
     this.delay(this.startFlanker, this.primeTime);
   };
 

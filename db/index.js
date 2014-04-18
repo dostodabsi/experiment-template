@@ -35,11 +35,3 @@ exports.updateUser = function(req, res, next) {
     });
   });
 };
-
-
-exports.viewData = function(req, res, next) {
-  db.view('bakk', 'getAll', function(err, body) {
-    if (err) return next(err);
-    res.send(body);
-  });
-};
