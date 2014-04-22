@@ -86,8 +86,12 @@ body {
 }
 
 .prime {
-	width: 500px;
-	height: 500px;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+	position: absolute;
 }
 
 .prompt {
@@ -96,8 +100,9 @@ body {
 }
 
 .questions input[type="text"] {
-	height: 40px;
-	font-size: 28px;
+	height: 50px;
+	padding: 8px;
+	font-size: 30px;
 }
 
 #errors {

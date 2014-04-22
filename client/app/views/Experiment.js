@@ -16,11 +16,13 @@ var ExperimentView = Backbone.View.extend({
 
   initialize: function() {
     this.stimuli = {
-      onehand: ['hammer'],/* 'teapot', 'spoon', 'knife',*/
-                //'scissors', 'screwdriver', 'tweezer', 'fork'],
+      // black and white images
+      onehand: ['nail', 'drill', 'dustpan', 'tweezer'],
+      twohand: ['ladder', 'rake', 'shovel', 'wheelbarrow'],
 
-      twohand: ['rake'],/*, 'axe', 'shovel', 'reaping hook']*/
-                //'paddle', 'staple gun', 'ladder', 'hand scraper'],
+      // these images are colored
+      //onehand: ['fork', 'screwdriver', 'handsaw', 'hammer'],
+      //twohand: ['shovel_color', 'snow_shovel', 'wheelbarrow_color', 'rake'],
 
       congrH   : _.template(flanker, { stim: 'HHHHHHH', color: 'white' }),
       congrS   : _.template(flanker, { stim: 'SSSSSSS', color: 'white' }),
@@ -48,6 +50,7 @@ var ExperimentView = Backbone.View.extend({
         //['twohand' , 'incongrH' , 'no_gap' , 'incongruent incompatible'],
         //['twohand' , 'incongrS' , 'no_gap' , 'incongruent incompatible'],
       ]
+
     };
 
     this.config = {
@@ -70,29 +73,34 @@ var ExperimentView = Backbone.View.extend({
     var config  = _.clone(this.config);
     var stimuli = _.clone(this.stimuli);
 
-    stimuli.trials  = _.shuffle(this.stimuli.trials).splice(0, 4);
     stimuli.onehand = [_.first(_.shuffle(this.stimuli.onehand))];
     stimuli.twohand = [_.first(_.shuffle(this.stimuli.twohand))];
+    stimuli.trials = [
+        ['onehand' , 'congrH'   , 'no_gap' , 'congruent compatible'],
+        ['twohand' , 'congrS'   , 'gap'    , 'congruent compatible'],
+        ['onehand' , 'congrS'   , 'gap'    , 'congruent incompatible'],
+        ['twohand' , 'congrH'   , 'no_gap' , 'congruent incompatible'],
+        ['onehand' , 'incongrH' , 'no_gap' , 'incongruent compatible'],
+        ['twohand' , 'incongrS' , 'gap'    , 'incongruent compatible'],
+        ['onehand' , 'incongrS' , 'gap'    , 'incongruent incompatible'],
+        ['twohand' , 'incongrH' , 'no_gap' , 'incongruent incompatible'],
+      ];
 
     config.practice    = true;
     config.timeout     = 99999;
     config.stimuli     = stimuli;
     config.participant = undefined;
 
-    var practice = new Flanker(config, _.bind(this.onPracticeEnd, this));
+    var practice = new Flanker(config, _.bind(this.startExperiment, this));
     practice.startExperiment();
   },
 
-  onPracticeEnd: function() {
-    this.startExperiment();
-  },
-
   startExperiment: function() {
-    var experiment = new Flanker(this.config, _.bind(this.whenFinished, this));
+    var experiment = new Flanker(this.config, _.bind(this.onExpEnd, this));
     experiment.startExperiment();
   },
 
-  whenFinished: function() {
+  onExpEnd: function() {
     this.showCursor();
     Backbone.history.navigate('debriefing', { trigger: true });
   },

@@ -1,6 +1,5 @@
 var db      = require('./db');
 var express = require('express');
-
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 
@@ -14,7 +13,6 @@ app.use(express.static(images));
 app.use(bodyParser());
 app.use(methodOverride());
 
-app.get('/api/participant', db.getUser);
 app.post('/api/participant', db.createUser);
 app.put('/api/participant/:id', db.updateUser);
 

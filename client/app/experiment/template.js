@@ -1,6 +1,6 @@
-var $        = require('jquery');
-var _        = require('underscore');
-var utils    = require('../utils');
+var $     = require('jquery');
+var _     = require('underscore');
+var utils = require('../utils');
 
 function ExperimentTemplate() {
   // no private stuff

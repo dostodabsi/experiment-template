@@ -1,5 +1,5 @@
-var $  = require('jquery');
-var _  = require('underscore');
+var $ = require('jquery');
+var _ = require('underscore');
 var ExperimentTemplate = require('./template');
 
 
@@ -50,8 +50,8 @@ function Flanker(config, callback) {
 
 
   this.prepareBlock = function() {
-    var trials  = this.prepareStimuli(this.stimuli);
-    this.block  = _.shuffle(trials);
+    var trials = this.prepareStimuli(this.stimuli);
+    this.block = _.shuffle(trials);
   };
 
 
@@ -114,6 +114,7 @@ function Flanker(config, callback) {
 
   this.startExperiment = function() {
     this.extend('startExperiment', this);
+    this.preloadImages();
     this.prepareBlock();
     this.pause();
   },
@@ -142,8 +143,7 @@ function Flanker(config, callback) {
 
 
   this.showPrime = function() {
-    var stim = { stim: this.trial.prime, color: 'white' };
-    this.changeStim(this.prime(stim));
+    this.changeImage(this.trial.prime, '.png');
     this.delay(this.startFlanker, this.primeTime);
   };
 
@@ -338,9 +338,19 @@ function Flanker(config, callback) {
   };
 
 
-  this.changeImage = function(img) {
-    this.changeStim();
-    $('.prime').attr('src', img);
+  this.changeImage = function(img, type) {
+    var prime = '<img class="prime" src="{prime}">'
+                 .replace('{prime}', img + type);
+    this.changeStim(prime);
+  };
+
+  
+  this.preloadImages = function() {
+    var images = this.stimuli.onehand.concat(this.stimuli.twohand);
+    _.each(images, function(img) {
+      var i = new Image();
+      i.src = img + '.png';
+    });
   };
 
 

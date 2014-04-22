@@ -7,7 +7,7 @@ var browserify = require('gulp-browserify');
 var source     = require('vinyl-source-stream');
 
 var options = {
-  debug: true,
+  debug: false,
   insertGlobals: true,
   transform: ['brfs']
 };
@@ -16,7 +16,7 @@ var options = {
 gulp.task('build', function() {
   return gulp.src('./client/app/main.js')
           .pipe(browserify(options))
-          //.pipe(uglify())
+          .pipe(uglify())
           .pipe(gulp.dest('./client/static/build'));
 });
 

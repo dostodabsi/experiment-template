@@ -1,14 +1,6 @@
-var nano = require('nano')('http://localhost:5984');
+var url  = process.env.CLOUDANT_URL || 'http://localhost:5984';
+var nano = require('nano')(url);
 var db   = nano.use('bakk');
-
-
-exports.getUser = function(req, res, next) {
-  db.get(req.session.user, function(err, body) {
-    if (err) return next(err);
-    res.send(body);
-  });
-};
-
 
 exports.createUser = function(req, res, next) {
   db.insert(req.body, function(err, body) {
@@ -16,7 +8,6 @@ exports.createUser = function(req, res, next) {
     res.send(body);
   });
 };
-
 
 exports.updateUser = function(req, res, next) {
   var id = req.params.id;
