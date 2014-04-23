@@ -28,6 +28,6 @@
 	"predef": [
 	  "describe",
 	  "alert",
-	  "prompt"
+	  "emit"
 	]
 }

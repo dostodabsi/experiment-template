@@ -129,5 +129,5 @@ body {
 }
 
 .hideCursor {
-	cursor: url("transparent.gif"), auto;
+	cursor: url("transparent.gif"), url("transparent.ani"), auto;
 }

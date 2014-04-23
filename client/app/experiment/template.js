@@ -9,14 +9,14 @@ function ExperimentTemplate() {
 ExperimentTemplate.prototype = {
 
   data: {
-    trials      : [],
-    block       : [],
-    quitter     : false,
-    changedTab  : false,
-    changedSize : false,
-    start       : undefined,
-    correct     : undefined,
-    duration    : undefined
+    trials       : [],
+    block        : [],
+    quitter      : false,
+    changedTab   : false,
+    changedSize  : false,
+    start        : undefined,
+    correct      : undefined,
+    duration     : undefined,
   },
 
   stimuli      : 'please override',
@@ -31,8 +31,9 @@ ExperimentTemplate.prototype = {
   },
 
 
-  extend: function(func, context) {
-    ExperimentTemplate.prototype[func].call(context);
+  extend: function(func, context, obj) {
+    var args = obj ? obj.args : null;
+    ExperimentTemplate.prototype[func].call(context, args);
   },
 
 
@@ -135,7 +136,7 @@ ExperimentTemplate.prototype = {
     var msg = 'By leaving, you opt out of the Experiment, are you sure?';
     var hasQuit = function() {
       this.set('quitter', true);
-      this.finish('interrupt');
+      this.finish('quit');
       return msg;
     };
     $(window).on('beforeunload', _.bind(hasQuit, this));
@@ -152,20 +153,21 @@ ExperimentTemplate.prototype = {
   },
 
 
-  finish: function(interrupt) {
-    this.removeKeyEvents();
+  finish: function(quit) {
     $(window).unbind('beforeunload');
-    this.set('duration', this.expduration());
+
+    var duration = this.expduration();
     var exp = _.omit(this.get('all'), ['start', 'correct', 'block']);
 
-    !this.participant ? console.log(exp) :
-                        this.participant.save({ exp: exp });
-    this.reset();
+    if (quit || !quit && !this.practice) {
+      this.participant.save({ exp: _.extend(exp, duration) });
+    }
   },
 
 
   expduration: function() {
-    return +new Date() - this.get('duration');
+    var duration = +new Date() - this.get('duration');
+    return { duration: duration };
   },
 
 
@@ -176,14 +178,6 @@ ExperimentTemplate.prototype = {
 
   set: function(key, val) {
     this.data[key] = val;
-  },
-
-
-  reset: function() {
-    this.set('block', []);
-    this.set('quitter', false);
-    this.set('changedTab', false);
-    this.set('changedSize', false);
   },
 
 

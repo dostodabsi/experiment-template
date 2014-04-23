@@ -5,7 +5,7 @@ var ExperimentTemplate = require('./template');
 
 function Flanker(config, callback) {
 
-  this.stop         = config.stop || 3;
+  this.stop         = config.stop || 2;
   this.ISI          = config.ISI || 500;
   this.timeout      = config.timeout || 1500;
   this.pauseTime    = config.pauseTime || 500;
@@ -58,11 +58,12 @@ function Flanker(config, callback) {
   this.prepareTrial = function() {
     var stim     = this.block.shift();
     this.corrAns = _.contains(stim[1], 'H') ? 'h' : 's';
+    var prime    = this.findPrime(_.first(stim));
 
     this.trial = {
       list: stim,
       type: stim[3],
-      prime: stim[0],
+      prime: prime,
       flanker: this.stimuli[stim[1]]
     };
   };
@@ -143,7 +144,7 @@ function Flanker(config, callback) {
 
 
   this.showPrime = function() {
-    this.changeImage(this.trial.prime, '.png');
+    this.changeImage(this.trial.prime);
     this.delay(this.startFlanker, this.primeTime);
   };
 
@@ -249,8 +250,8 @@ function Flanker(config, callback) {
     var code = ev.keyCode || ev.which;
     if (code === 32) {
       this.removeKeyEvents();
+      this.saveBlockData();
       if (!this.practice) {
-        this.saveBlockData();
         this.prepareBlock();
         this.pause();
       }
@@ -258,13 +259,13 @@ function Flanker(config, callback) {
     }
   };
 
-
   this.saveBlockData = function() {
-    var block    = {};
-    var count    = this.blockCount++;
-    block[count] = this.get('block');
-    block.time   = +new Date() - this.blockStart;
-    var save     = this.get('trials').concat(block);
+    var block  = {};
+    var count  = this.blockCount++;
+    var key    = this.practice ? 'practice' : count;
+    block[key] = this.get('block');
+    block.time = +new Date() - this.blockStart;
+    var save   = this.get('trials').concat(block);
 
     this.set('trials', save);
     this.set('block', []);
@@ -297,9 +298,9 @@ function Flanker(config, callback) {
    * did not quit, clears all the timeouts and calls a callback function
    ********************************************************************/
 
-  this.finish = function(interrupt) {
-    this.extend('finish', this);
-    if (!interrupt) {
+  this.finish = function(quit) {
+    this.extend('finish', this, { args: quit });
+    if (!quit) {
       clearTimeout(this.fbTimeout);
       clearTimeout(this.pauseTimeout);
       clearTimeout(this.tooSlowTimeout);
@@ -338,19 +339,27 @@ function Flanker(config, callback) {
   };
 
 
-  this.changeImage = function(img, type) {
-    var prime = '<img class="prime" src="{prime}">'
-                 .replace('{prime}', img + type);
+  this.changeImage = function(img) {
+    this.imageStart = +new Date();
+    var prime = $(img).addClass('prime');
     this.changeStim(prime);
   };
 
-  
+
   this.preloadImages = function() {
     var images = this.stimuli.onehand.concat(this.stimuli.twohand);
-    _.each(images, function(img) {
+    this.preloadedImages = _.map(images, function(img) {
       var i = new Image();
-      i.src = img + '.png';
+      i.src = img;
+      return i;
     });
+  };
+
+
+  this.findPrime = function(name) {
+    return _.first(_.filter(this.preloadedImages, function(img) {
+      return _.last(img.src.split('/')) === name;
+    }));
   };
 
 

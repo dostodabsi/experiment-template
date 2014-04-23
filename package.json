@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/dostodabsi/experiment-template"
+    "url": "git://github.com/dostodabsi/crowd-flanker"
   },
   "dependencies": {
     "jquery": "^2.1.0",

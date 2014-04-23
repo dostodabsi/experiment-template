@@ -1,13 +1,14 @@
 var brfs       = require('brfs');
 var gulp       = require('gulp');
-var watchify   = require('watchify');
 var jshint     = require('gulp-jshint');
 var uglify     = require('gulp-uglify');
-var browserify = require('gulp-browserify');
 var source     = require('vinyl-source-stream');
+var watchify   = require('watchify');
+var browserify = require('gulp-browserify');
+
 
 var options = {
-  debug: false,
+  debug: true,
   insertGlobals: true,
   transform: ['brfs']
 };
@@ -34,7 +35,7 @@ gulp.task('hint', function() {
 });
 
 
-// Watch for changes in the background
+// run browserify when stuff changes
 gulp.task('watch', function() {
   var bundler = watchify('./client/app/main.js');
   bundler.transform('brfs');

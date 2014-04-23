@@ -1,4 +1,3 @@
-/* global emit */
 var url  = process.env.CLOUDANT_URL || 'http://localhost:5984';
 var nano = require('nano')(url);
 var db   = nano.use('bakk');
