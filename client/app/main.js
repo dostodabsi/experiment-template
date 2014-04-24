@@ -1,14 +1,15 @@
-var _            = require('underscore');
-var $            = require('jquery');
-var Backbone     = require('backbone');
+var _        = require('underscore');
+var $        = require('jquery');
+var Backbone = require('backbone');
 Backbone.$ = $;
 
-var Router       = require('./routers/Router');
-var Instruction  = require('./views/Instruction');
-var Explanation  = require('./views/Explanation');
-var Questions    = require('./views/Questions');
-var Experiment   = require('./views/Experiment');
-var Debriefing   = require('./views/Debriefing');
+var Router      = require('./routers/Router');
+var Instruction = require('./views/Instruction');
+var Explanation = require('./views/Explanation');
+var Questions   = require('./views/Questions');
+var Experiment  = require('./views/Experiment');
+var Feedback    = require('./views/Feedback');
+var Debriefing  = require('./views/Debriefing');
 
 Router.on('route:instruction', function() {
   var instruction = new Instruction();
@@ -28,6 +29,11 @@ Router.on('route:questions', function() {
 Router.on('route:exp', function() {
   var experiment = new Experiment();
   experiment.render();
+});
+
+Router.on('route:feedback', function() {
+  var feedback = new Feedback();
+  feedback.render();
 });
 
 Router.on('route:debriefing', function() {

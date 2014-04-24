@@ -14,7 +14,7 @@ body {
 	font-size: 24px;
 }
 
-.instruction, .debriefing, .explanation, .questions {
+.instruction, .debriefing, .explanation, .questions, .exp-feedback {
 	margin-top: 10%;
 }
 

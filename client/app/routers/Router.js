@@ -8,6 +8,7 @@ var Router = Backbone.Router.extend({
     'explanation' : 'explanation',
     'questions'   : 'questions',
     'exp'         : 'exp',
+    'feedback'    : 'feedback',
     'debriefing'  : 'debriefing'
   },
 

@@ -5,7 +5,7 @@ var ExperimentTemplate = require('./template');
 
 function Flanker(config, callback) {
 
-  this.stop         = config.stop || 2;
+  this.stop         = config.stop || 1;
   this.ISI          = config.ISI || 500;
   this.timeout      = config.timeout || 1500;
   this.pauseTime    = config.pauseTime || 500;

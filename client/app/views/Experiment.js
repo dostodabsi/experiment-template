@@ -97,7 +97,7 @@ var ExperimentView = Backbone.View.extend({
 
   onExpEnd: function() {
     this.showCursor();
-    Backbone.history.navigate('debriefing', { trigger: true });
+    Backbone.history.navigate('feedback', { trigger: true });
   },
 
   showCursor: function() {

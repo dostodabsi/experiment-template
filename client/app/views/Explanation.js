@@ -1,7 +1,7 @@
-var fs          = require('fs');
-var $           = require('jquery');
-var _           = require('underscore');
-var Backbone    = require('backbone');
+var fs       = require('fs');
+var $        = require('jquery');
+var _        = require('underscore');
+var Backbone = require('backbone');
 
 var explanation = fs.readFileSync(
     __dirname + '/../templates/explanation.html', 'utf-8');
