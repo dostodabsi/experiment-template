@@ -8,7 +8,7 @@ var browserify = require('gulp-browserify');
 
 
 var options = {
-  debug: true,
+  debug: false,
   insertGlobals: true,
   transform: ['brfs']
 };
